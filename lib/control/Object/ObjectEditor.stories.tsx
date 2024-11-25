@@ -6,8 +6,8 @@ import React from 'react';
 type StoryProps = ComponentProps<typeof ObjectEditor>;
 
 const meta: Meta<StoryProps> = {
-  title: 'Control/ObjectEditor',
-  component: ObjectEditor,
+    title: 'Control/ObjectEditor',
+    component: ObjectEditor,
 };
 
 export default meta;
@@ -15,16 +15,16 @@ export default meta;
 type Story = StoryObj<StoryProps>;
 
 export const Default: Story = {
-  render: () => {
-    const [object, setObject] = useState([1, 2, 3, 4]);
+    render: () => {
+        const [object, setObject] = useState([1, 2, 3, 4]);
 
-    return (
-      <ObjectEditor
-        title="Object Editor"
-        description="Edit object"
-        object={object}
-        setObject={setObject}
-      />
-    );
-  },
+        return (
+            <ObjectEditor
+                title="Object Editor"
+                description="Edit object"
+                object={object}
+                setObject={setObject}
+            />
+        );
+    },
 };

@@ -6,239 +6,245 @@ import { ChevronDown, ChevronUp, Plus, Trash2, Pencil, Check, X, GripVertical } 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 type CommonControlProps = {
-  title: string;
-  description: string;
+    title: string;
+    description: string;
 };
 
 type TextArrayControlProps = CommonControlProps & {
-  value: string[];
-  setValue: React.Dispatch<React.SetStateAction<string[]>>;
-  option?: {
-    placeholder?: string;
-    maxLength?: number;
-  };
+    value: string[];
+    setValue: React.Dispatch<React.SetStateAction<string[]>>;
+    option?: {
+        placeholder?: string;
+        maxLength?: number;
+    };
 };
 
-const TextArrayControl: React.FC<TextArrayControlProps> = ({
-  title,
-  description,
-  value,
-  setValue,
-  option,
+export const TextArrayControl: React.FC<TextArrayControlProps> = ({
+    title,
+    description,
+    value,
+    setValue,
+    option,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [newValue, setNewValue] = useState<string>('');
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [editValue, setEditValue] = useState<string>('');
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-  const timeoutRef = useRef<number | null>(null);
+    const [isOpen, setIsOpen] = useState(false);
+    const [newValue, setNewValue] = useState<string>('');
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+    const [editValue, setEditValue] = useState<string>('');
+    const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+    const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+    const timeoutRef = useRef<number | null>(null);
 
-  const handleAddValue = () => {
-    if (newValue.trim()) {
-      if (option?.maxLength && newValue.length > option.maxLength) return;
-      setValue((prev) => [...prev, newValue.trim()]);
-      setNewValue('');
-    }
-  };
+    const handleAddValue = () => {
+        if (newValue.trim()) {
+            if (option?.maxLength && newValue.length > option.maxLength) return;
+            setValue((prev) => [...prev, newValue.trim()]);
+            setNewValue('');
+        }
+    };
 
-  const handleRemoveValue = (index: number) => {
-    setValue((prev) => prev.filter((_, i) => i !== index));
-  };
+    const handleRemoveValue = (index: number) => {
+        setValue((prev) => prev.filter((_, i) => i !== index));
+    };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (option?.maxLength && value.length > option.maxLength) return;
-    setNewValue(value);
-  };
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        if (option?.maxLength && value.length > option.maxLength) return;
+        setNewValue(value);
+    };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      if (editingIndex !== null) {
-        handleSaveEdit();
-      } else if (newValue.trim() !== '') {
-        handleAddValue();
-      }
-    }
-  };
+    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            if (editingIndex !== null) {
+                handleSaveEdit();
+            } else if (newValue.trim() !== '') {
+                handleAddValue();
+            }
+        }
+    };
 
-  const startEditing = (index: number) => {
-    setEditingIndex(index);
-    setEditValue(value[index] || '');
-  };
+    const startEditing = (index: number) => {
+        setEditingIndex(index);
+        setEditValue(value[index] || '');
+    };
 
-  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (option?.maxLength && value.length > option.maxLength) return;
-    setEditValue(value);
-  };
+    const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        if (option?.maxLength && value.length > option.maxLength) return;
+        setEditValue(value);
+    };
 
-  const handleSaveEdit = () => {
-    if (editingIndex !== null && editValue.trim()) {
-      setValue((prev) => prev.map((v, i) => (i === editingIndex ? editValue.trim() : v)));
-      setEditingIndex(null);
-      setEditValue('');
-    }
-  };
+    const handleSaveEdit = () => {
+        if (editingIndex !== null && editValue.trim()) {
+            setValue((prev) => prev.map((v, i) => (i === editingIndex ? editValue.trim() : v)));
+            setEditingIndex(null);
+            setEditValue('');
+        }
+    };
 
-  const handleCancelEdit = () => {
-    setEditingIndex(null);
-    setEditValue('');
-  };
+    const handleCancelEdit = () => {
+        setEditingIndex(null);
+        setEditValue('');
+    };
 
-  const handleDragStart = (e: React.DragEvent, index: number) => {
-    setDraggedIndex(index);
-    e.dataTransfer.effectAllowed = 'move';
-  };
-
-  const handleDragEnd = () => {
-    setDraggedIndex(null);
-    setDragOverIndex(null);
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  };
-
-  const handleDragEnter = (index: number) => {
-    if (draggedIndex === null || draggedIndex === index) return;
-    setDragOverIndex(index);
-
-    if (timeoutRef.current) {
-      window.clearTimeout(timeoutRef.current);
-    }
-
-    timeoutRef.current = window.setTimeout(() => {
-      setValue((prev) => {
-        const newArray = [...prev];
-        const [draggedItem] = newArray.splice(draggedIndex, 1);
-        newArray.splice(index, 0, draggedItem || '');
+    const handleDragStart = (e: React.DragEvent, index: number) => {
         setDraggedIndex(index);
-        return newArray;
-      });
-    }, 200);
-  };
+        e.dataTransfer.effectAllowed = 'move';
+    };
 
-  return (
-    <Card className="w-full p-4">
-      <Collapsible
-        open={isOpen}
-        onOpenChange={setIsOpen}
-      >
-        <CardHeader className="p-0 mb-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle className="text-sm font-medium">{title}</CardTitle>
-              <CardDescription className="text-xs">{description}</CardDescription>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">{value.length} items</span>
-              <CollapsibleTrigger className="hover:bg-accent hover:text-accent-foreground p-2 rounded-md">
-                {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-              </CollapsibleTrigger>
-            </div>
-          </div>
-        </CardHeader>
+    const handleDragEnd = () => {
+        setDraggedIndex(null);
+        setDragOverIndex(null);
+    };
 
-        <CollapsibleContent>
-          <CardContent className="p-0 space-y-4">
-            <div className="flex gap-2">
-              <Input
-                type="text"
-                value={newValue}
-                onChange={handleInputChange}
-                onKeyPress={handleKeyPress}
-                placeholder={option?.placeholder || 'Enter text'}
-                className="w-full"
-              />
-              <Button
-                onClick={handleAddValue}
-                variant="outline"
-                className="whitespace-nowrap"
-                disabled={!newValue.trim()}
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add
-              </Button>
-            </div>
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    };
 
-            <div className="space-y-2">
-              {value.map((text, index) => (
-                <div
-                  key={index}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, index)}
-                  onDragEnd={handleDragEnd}
-                  onDragOver={handleDragOver}
-                  onDragEnter={() => handleDragEnter(index)}
-                  className={`flex items-center gap-2 group rounded-md transition-all duration-200 ${
-                    draggedIndex === index
-                      ? 'opacity-50'
-                      : dragOverIndex === index
-                        ? 'translate-y-1'
-                        : ''
-                  }`}
-                >
-                  <div className="cursor-grab opacity-0 group-hover:opacity-100 transition-opacity px-1">
-                    <GripVertical className="w-4 h-4 text-muted-foreground" />
-                  </div>
-                  {editingIndex === index ? (
-                    <>
-                      <Input
-                        type="text"
-                        value={editValue}
-                        onChange={handleEditChange}
-                        onKeyPress={handleKeyPress}
-                        className="flex-1"
-                        autoFocus
-                      />
-                      <div className="flex gap-1">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleSaveEdit}
-                        >
-                          <Check className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleCancelEdit}
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="flex-1 p-2 border rounded-md bg-background">{text}</div>
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => startEditing(index)}
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleRemoveValue(index)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </CollapsibleContent>
-      </Collapsible>
-    </Card>
-  );
+    const handleDragEnter = (index: number) => {
+        if (draggedIndex === null || draggedIndex === index) return;
+        setDragOverIndex(index);
+
+        if (timeoutRef.current) {
+            window.clearTimeout(timeoutRef.current);
+        }
+
+        timeoutRef.current = window.setTimeout(() => {
+            setValue((prev) => {
+                const newArray = [...prev];
+                const [draggedItem] = newArray.splice(draggedIndex, 1);
+                newArray.splice(index, 0, draggedItem || '');
+                setDraggedIndex(index);
+                return newArray;
+            });
+        }, 200);
+    };
+
+    return (
+        <Card className="w-full p-4">
+            <Collapsible
+                open={isOpen}
+                onOpenChange={setIsOpen}
+            >
+                <CardHeader className="p-0 mb-4">
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <CardTitle className="text-sm font-medium">{title}</CardTitle>
+                            <CardDescription className="text-xs">{description}</CardDescription>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm text-muted-foreground">
+                                {value.length} items
+                            </span>
+                            <CollapsibleTrigger className="hover:bg-accent hover:text-accent-foreground p-2 rounded-md">
+                                {isOpen ? (
+                                    <ChevronUp className="h-4 w-4" />
+                                ) : (
+                                    <ChevronDown className="h-4 w-4" />
+                                )}
+                            </CollapsibleTrigger>
+                        </div>
+                    </div>
+                </CardHeader>
+
+                <CollapsibleContent>
+                    <CardContent className="p-0 space-y-4">
+                        <div className="flex gap-2">
+                            <Input
+                                type="text"
+                                value={newValue}
+                                onChange={handleInputChange}
+                                onKeyPress={handleKeyPress}
+                                placeholder={option?.placeholder || 'Enter text'}
+                                className="w-full"
+                            />
+                            <Button
+                                onClick={handleAddValue}
+                                variant="outline"
+                                className="whitespace-nowrap"
+                                disabled={!newValue.trim()}
+                            >
+                                <Plus className="w-4 h-4 mr-2" />
+                                Add
+                            </Button>
+                        </div>
+
+                        <div className="space-y-2">
+                            {value.map((text, index) => (
+                                <div
+                                    key={index}
+                                    draggable
+                                    onDragStart={(e) => handleDragStart(e, index)}
+                                    onDragEnd={handleDragEnd}
+                                    onDragOver={handleDragOver}
+                                    onDragEnter={() => handleDragEnter(index)}
+                                    className={`flex items-center gap-2 group rounded-md transition-all duration-200 ${
+                                        draggedIndex === index
+                                            ? 'opacity-50'
+                                            : dragOverIndex === index
+                                              ? 'translate-y-1'
+                                              : ''
+                                    }`}
+                                >
+                                    <div className="cursor-grab opacity-0 group-hover:opacity-100 transition-opacity px-1">
+                                        <GripVertical className="w-4 h-4 text-muted-foreground" />
+                                    </div>
+                                    {editingIndex === index ? (
+                                        <>
+                                            <Input
+                                                type="text"
+                                                value={editValue}
+                                                onChange={handleEditChange}
+                                                onKeyPress={handleKeyPress}
+                                                className="flex-1"
+                                                autoFocus
+                                            />
+                                            <div className="flex gap-1">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={handleSaveEdit}
+                                                >
+                                                    <Check className="w-4 h-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={handleCancelEdit}
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </Button>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="flex-1 p-2 border rounded-md bg-background">
+                                                {text}
+                                            </div>
+                                            <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => startEditing(index)}
+                                                >
+                                                    <Pencil className="w-4 h-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => handleRemoveValue(index)}
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </CardContent>
+                </CollapsibleContent>
+            </Collapsible>
+        </Card>
+    );
 };
-
-export default TextArrayControl;

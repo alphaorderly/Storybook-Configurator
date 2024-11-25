@@ -6,8 +6,8 @@ import React from 'react';
 type StoryProps = ComponentProps<typeof NumberArray>;
 
 const meta: Meta<StoryProps> = {
-  title: 'Control/NumberArray',
-  component: NumberArray,
+    title: 'Control/NumberArray',
+    component: NumberArray,
 };
 
 export default meta;
@@ -15,17 +15,17 @@ export default meta;
 type Story = StoryObj<StoryProps>;
 
 export const Default: Story = {
-  render: () => {
-    const [array, setArray] = React.useState([1, 2, 3]);
+    render: () => {
+        const [array, setArray] = React.useState([1, 2, 3]);
 
-    return (
-      <NumberArray
-        key={1}
-        title="Number Array"
-        description="This is a number array"
-        value={array}
-        setValue={setArray}
-      />
-    );
-  },
+        return (
+            <NumberArray
+                key={1}
+                title="Number Array"
+                description="This is a number array"
+                value={array}
+                setValue={setArray}
+            />
+        );
+    },
 };

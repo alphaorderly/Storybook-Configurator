@@ -6,8 +6,8 @@ import React from 'react';
 type StoryProps = ComponentProps<typeof BoolToggle>;
 
 const meta: Meta<StoryProps> = {
-  title: 'Control/BoolToggle',
-  component: BoolToggle,
+    title: 'Control/BoolToggle',
+    component: BoolToggle,
 };
 
 export default meta;
@@ -15,16 +15,16 @@ export default meta;
 type Story = StoryObj<StoryProps>;
 
 export const Default: Story = {
-  render: () => {
-    const [value, setValue] = useState(false);
+    render: () => {
+        const [value, setValue] = useState(false);
 
-    return (
-      <BoolToggle
-        title="Bool Toggle"
-        description="This is a bool toggle"
-        value={value}
-        setValue={setValue}
-      />
-    );
-  },
+        return (
+            <BoolToggle
+                title="Bool Toggle"
+                description="This is a bool toggle"
+                value={value}
+                setValue={setValue}
+            />
+        );
+    },
 };
