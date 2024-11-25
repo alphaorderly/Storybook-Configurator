@@ -1,5 +1,5 @@
 /// <reference types="vitest" />
-import { join, resolve } from 'node:path';
+import path, { join, resolve } from 'node:path';
 import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
@@ -7,6 +7,11 @@ import dts from 'vite-plugin-dts';
 import { peerDependencies } from './package.json';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './lib'),
+    },
+  },
   plugins: [
     react(),
     dts({ rollupTypes: true }), // Output .d.ts files

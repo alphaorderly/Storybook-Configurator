@@ -65,7 +65,12 @@
     "noPropertyAccessFromIndexSignature": true,
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": false,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./lib/*"]
+    }
   },
   "include": ["./lib/**/*.ts", "./lib/**/*.tsx"],
   "exclude": ["./lib/**/*.stories.*"]
