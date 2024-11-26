@@ -1,6 +1,6 @@
 {
     "name": "storybook-configurator",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "description": "Easier Storybook testing / setting",
     "author": "alphaorderly",
     "license": "MIT",
