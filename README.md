@@ -19,6 +19,8 @@ All components share these base props:
 
 ## Dashboard Component
 
+![picture 11](images/b6fead041fd8efb0ef39f1efee8a6f27e304305b58fa3afede290aa8c7b16d4c.png)
+
 The Dashboard component serves as the main container for your interactive stories.
 
 ### Props
@@ -69,6 +71,8 @@ setState('numberarray', newValue); // Set state value
 
 ### 1. NumberArray
 
+![picture 12](images/0a4a92f6e7d8d9c53f48474db8021d31adcf7950da0ba12fc5d4771c26ebfdc8.png)
+
 A component to modify an array of numbers.
 
 ```tsx
@@ -81,6 +85,8 @@ A component to modify an array of numbers.
 ```
 
 ### 2. NumberInput
+
+![picture 14](images/8070eb0491350db5089e2e87687593e8f6375366ce47d12b6a1af095d41e6deb.png)
 
 Input component for single number values.
 
@@ -105,6 +111,8 @@ type NumberInputOptions = {
 ```
 
 ### 3. NumberSlider
+
+![picture 15](images/e18b6844f8ad9282c821725ad57477328a8742ec8a67121bdde3237ff514bd79.png)
 
 A slider component for number values.
 
@@ -131,6 +139,8 @@ type NumberSliderOptions = {
 
 ### 4. ObjectEditor
 
+![picture 16](images/763ce868e7665b367d7de8c9697eebf964361b2827e104266e812dbed109fe75.png)
+
 An editor for objects and arrays.
 
 #### Options
@@ -154,6 +164,8 @@ type ObjectEditorOptions = {
 
 ### 5. ColorPicker
 
+![picture 17](images/2dafdfac91fe7248a295863dce811541cd582837e0b42d9c10bc3697d10a6a82.png)
+
 A component for selecting colors.
 
 ```tsx
@@ -167,6 +179,8 @@ A component for selecting colors.
 
 ### 6. TextArray
 
+![picture 18](images/b824760daeaa98cf0e5d59c9cbbaf8867e46ce4bcc879178ee3ea58aa7932719.png)
+
 Modify an array of text values.
 
 ```tsx
@@ -179,6 +193,8 @@ Modify an array of text values.
 ```
 
 ### 7. TextInput
+
+![picture 19](images/76d2879d426a67a57bbbfaf9443b1a15c3784cb3a243170c2f729aac9560c525.png)
 
 Input component for text values.
 
@@ -203,6 +219,8 @@ type TextInputOptions = {
 
 ### 8. TextSelector
 
+![picture 20](images/98c48ece4529fa61cb228f40b31889cd88358d967d3c5f2aa44f6155d4824447.png)
+
 A dropdown component to select from predefined options.
 
 ```tsx
@@ -219,6 +237,8 @@ const options = ['one', 'two', 'three'];
 ```
 
 ### 9. BoolToggle
+
+![picture 21](images/b5b9f578ce61adbd3fe0dec76d83a6d2b84a34b1d8e8a4637997bd9dec4d3f2e.png)
 
 A toggle component for boolean values.
 
