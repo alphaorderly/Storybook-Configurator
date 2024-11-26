@@ -1,5 +1,5 @@
 import { ComponentProps, useState } from 'react';
-import ObjectEditor from './ObjectEditor';
+import { ObjectEditor } from './ObjectEditor';
 import { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 

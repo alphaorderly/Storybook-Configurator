@@ -2,19 +2,18 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Input } from '@/components/ui/input';
+import type { CommonProps } from '@/types/Props';
 
 type NumberSliderProps = {
-    title: string;
-    description: string;
     value: number;
-    setValue: React.Dispatch<React.SetStateAction<number>>;
+    setValue: (value: number) => void;
     option?: {
         min?: number;
         max?: number;
         step?: number;
         showInput?: boolean;
     };
-};
+} & CommonProps;
 
 export const NumberSlider: React.FC<NumberSliderProps> = ({
     title,

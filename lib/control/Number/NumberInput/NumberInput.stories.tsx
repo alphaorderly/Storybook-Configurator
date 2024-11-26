@@ -1,5 +1,5 @@
 import { ComponentProps, useState } from 'react';
-import NumberInput from './NumberInput';
+import { NumberInput } from './NumberInput';
 import { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 

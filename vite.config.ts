@@ -1,21 +1,15 @@
 /// <reference types="vitest" />
-import path, { join, resolve } from 'node:path';
+import path from 'path';
+import { join, resolve } from 'path';
 import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 import { peerDependencies } from './package.json';
 
 export default defineConfig({
-    resolve: {
-        alias: {
-            '@': path.resolve(__dirname, './lib'),
-        },
-    },
-    plugins: [
-        react(),
-        dts({ rollupTypes: true }), // Output .d.ts files
-    ],
+    plugins: [react(), dts({ rollupTypes: true }), tsconfigPaths()],
     build: {
         target: 'esnext',
         minify: false,

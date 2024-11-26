@@ -1,5 +1,5 @@
 import { ComponentProps, useState } from 'react';
-import BoolToggle from './BoolToggle';
+import { BoolToggle } from './BoolToggle';
 import { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 

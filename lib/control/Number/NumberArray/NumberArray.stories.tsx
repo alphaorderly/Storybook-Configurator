@@ -1,5 +1,5 @@
 import { ComponentProps } from 'react';
-import NumberArray from './NumberArray';
+import { NumberArray } from './NumberArray';
 import { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 

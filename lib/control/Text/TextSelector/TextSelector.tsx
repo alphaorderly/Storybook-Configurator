@@ -8,57 +8,44 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { TextSelect } from 'lucide-react';
+import type { CommonProps } from '@/types/Props';
 
-type CommonControlProps = {
-    title: string;
-    description: string;
-};
-
-type TextSelectorControlProps = CommonControlProps & {
+type TextSelectorProps = CommonProps & {
     selected: string;
-    setSelected: React.Dispatch<React.SetStateAction<string>>;
+    setSelected: (value: string) => void;
     select: string[];
-    option?: {
-        defaultValue?: string;
-        placeholder?: string;
-    };
 };
 
-export const TextSelectorControl: React.FC<TextSelectorControlProps> = ({
+export const TextSelector: React.FC<TextSelectorProps> = ({
     title,
     description,
     selected,
     setSelected,
     select,
-    option,
 }) => {
-    // 선택지가 없는 경우 기본값 처리
     React.useEffect(() => {
         if (!selected && select.length > 0) {
-            if (option?.defaultValue && select.includes(option.defaultValue)) {
-                setSelected(option.defaultValue);
+            if (select.includes(selected)) {
+                setSelected(selected);
             }
         }
-    }, [select, selected, setSelected, option?.defaultValue]);
+    }, [select, selected, setSelected]);
 
     return (
-        <Card className="w-full">
-            <CardHeader>
-                <div className="flex items-center space-x-2">
-                    <TextSelect className="w-4 h-4 text-muted-foreground" />
-                    <div>
-                        <CardTitle className="text-lg">{title}</CardTitle>
-                        <CardDescription>{description}</CardDescription>
-                    </div>
+        <Card className="w-full p-4 space-y-4">
+            <CardHeader className="p-0">
+                <div className="space-y-2">
+                    <CardTitle className="text-sm font-medium">{title}</CardTitle>
+                    <CardDescription className="text-xs">{description}</CardDescription>
                 </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
                 <Select
                     value={selected}
                     onValueChange={setSelected}
                 >
                     <SelectTrigger className="w-full">
-                        <SelectValue placeholder={option?.placeholder || '선택하세요'} />
+                        <SelectValue placeholder={selected} />
                     </SelectTrigger>
                     <SelectContent>
                         {select.map((item) => (

@@ -1,5 +1,5 @@
 import { ComponentProps, useState } from 'react';
-import TextArray from './TextArray';
+import { TextArray } from './TextArray';
 import { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 

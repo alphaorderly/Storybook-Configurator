@@ -4,22 +4,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ChevronDown, ChevronUp, Plus, Trash2, Pencil, Check, X, GripVertical } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import type { CommonProps } from '@/types/Props';
+import { twMerge } from 'tailwind-merge';
 
-type CommonControlProps = {
-    title: string;
-    description: string;
-};
-
-type TextArrayControlProps = CommonControlProps & {
+type TextArrayProps = CommonProps & {
     value: string[];
-    setValue: React.Dispatch<React.SetStateAction<string[]>>;
+    setValue: (value: string[]) => void;
     option?: {
         placeholder?: string;
         maxLength?: number;
     };
 };
 
-export const TextArrayControl: React.FC<TextArrayControlProps> = ({
+export const TextArray: React.FC<TextArrayProps> = ({
     title,
     description,
     value,
@@ -37,13 +34,13 @@ export const TextArrayControl: React.FC<TextArrayControlProps> = ({
     const handleAddValue = () => {
         if (newValue.trim()) {
             if (option?.maxLength && newValue.length > option.maxLength) return;
-            setValue((prev) => [...prev, newValue.trim()]);
+            setValue([...value, newValue.trim()]);
             setNewValue('');
         }
     };
 
     const handleRemoveValue = (index: number) => {
-        setValue((prev) => prev.filter((_, i) => i !== index));
+        setValue(value.filter((_, i) => i !== index));
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,7 +72,7 @@ export const TextArrayControl: React.FC<TextArrayControlProps> = ({
 
     const handleSaveEdit = () => {
         if (editingIndex !== null && editValue.trim()) {
-            setValue((prev) => prev.map((v, i) => (i === editingIndex ? editValue.trim() : v)));
+            setValue(value.map((v, i) => (i === editingIndex ? editValue.trim() : v)));
             setEditingIndex(null);
             setEditValue('');
         }
@@ -110,40 +107,38 @@ export const TextArrayControl: React.FC<TextArrayControlProps> = ({
         }
 
         timeoutRef.current = window.setTimeout(() => {
-            setValue((prev) => {
-                const newArray = [...prev];
-                const [draggedItem] = newArray.splice(draggedIndex, 1);
-                newArray.splice(index, 0, draggedItem || '');
-                setDraggedIndex(index);
-                return newArray;
-            });
+            setValue(
+                (() => {
+                    const newArray = [...value];
+                    const [draggedItem] = newArray.splice(draggedIndex, 1);
+                    newArray.splice(index, 0, draggedItem || '');
+                    setDraggedIndex(index);
+                    return newArray;
+                })(),
+            );
         }, 200);
     };
 
     return (
-        <Card className="w-full p-4">
+        <Card className={twMerge(['w-full', isOpen ? 'p-4' : 'px-4 pt-4'])}>
             <Collapsible
                 open={isOpen}
                 onOpenChange={setIsOpen}
             >
                 <CardHeader className="p-0 mb-4">
-                    <div className="flex justify-between items-center">
-                        <div>
-                            <CardTitle className="text-sm font-medium">{title}</CardTitle>
-                            <CardDescription className="text-xs">{description}</CardDescription>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm text-muted-foreground">
-                                {value.length} items
-                            </span>
-                            <CollapsibleTrigger className="hover:bg-accent hover:text-accent-foreground p-2 rounded-md">
-                                {isOpen ? (
-                                    <ChevronUp className="h-4 w-4" />
-                                ) : (
-                                    <ChevronDown className="h-4 w-4" />
-                                )}
-                            </CollapsibleTrigger>
-                        </div>
+                    <div className="space-y-2">
+                        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+                        <CardDescription className="text-xs">{description}</CardDescription>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">{value.length} items</span>
+                        <CollapsibleTrigger className="hover:bg-accent hover:text-accent-foreground p-2 rounded-md">
+                            {isOpen ? (
+                                <ChevronUp className="h-4 w-4" />
+                            ) : (
+                                <ChevronDown className="h-4 w-4" />
+                            )}
+                        </CollapsibleTrigger>
                     </div>
                 </CardHeader>
 
@@ -154,8 +149,8 @@ export const TextArrayControl: React.FC<TextArrayControlProps> = ({
                                 type="text"
                                 value={newValue}
                                 onChange={handleInputChange}
-                                onKeyPress={handleKeyPress}
-                                placeholder={option?.placeholder || 'Enter text'}
+                                onKeyDown={handleKeyPress}
+                                placeholder={option?.placeholder || '추가할 텍스트 입력'}
                                 className="w-full"
                             />
                             <Button
@@ -164,7 +159,7 @@ export const TextArrayControl: React.FC<TextArrayControlProps> = ({
                                 className="whitespace-nowrap"
                                 disabled={!newValue.trim()}
                             >
-                                <Plus className="w-4 h-4 mr-2" />
+                                <Plus className="w-4 h-4 mr-1" />
                                 Add
                             </Button>
                         </div>
@@ -186,7 +181,7 @@ export const TextArrayControl: React.FC<TextArrayControlProps> = ({
                                               : ''
                                     }`}
                                 >
-                                    <div className="cursor-grab opacity-0 group-hover:opacity-100 transition-opacity px-1">
+                                    <div className="cursor-grab transition-opacity px-1">
                                         <GripVertical className="w-4 h-4 text-muted-foreground" />
                                     </div>
                                     {editingIndex === index ? (
@@ -195,7 +190,7 @@ export const TextArrayControl: React.FC<TextArrayControlProps> = ({
                                                 type="text"
                                                 value={editValue}
                                                 onChange={handleEditChange}
-                                                onKeyPress={handleKeyPress}
+                                                onKeyDown={handleKeyPress}
                                                 className="flex-1"
                                                 autoFocus
                                             />
@@ -221,7 +216,7 @@ export const TextArrayControl: React.FC<TextArrayControlProps> = ({
                                             <div className="flex-1 p-2 border rounded-md bg-background">
                                                 {text}
                                             </div>
-                                            <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                                            <div className=" transition-opacity flex gap-1">
                                                 <Button
                                                     variant="outline"
                                                     size="sm"

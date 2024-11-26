@@ -1,5 +1,5 @@
 import { ComponentProps } from 'react';
-import TextSelector from './TextSelector';
+import { TextSelector } from './TextSelector';
 import { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 

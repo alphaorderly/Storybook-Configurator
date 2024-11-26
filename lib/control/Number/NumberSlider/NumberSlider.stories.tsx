@@ -1,4 +1,4 @@
-import NumberSlider from './NumberSlider';
+import { NumberSlider } from './NumberSlider';
 import { Meta, StoryObj } from '@storybook/react';
 import React, { ComponentProps, useState } from 'react';
 

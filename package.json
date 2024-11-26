@@ -98,6 +98,7 @@
         "@radix-ui/react-switch": "^1.1.1",
         "class-variance-authority": "^0.7.0",
         "lucide-react": "^0.460.0",
-        "tailwindcss-animate": "^1.0.7"
+        "tailwindcss-animate": "^1.0.7",
+        "vite-tsconfig-paths": "^5.1.3"
     }
 }

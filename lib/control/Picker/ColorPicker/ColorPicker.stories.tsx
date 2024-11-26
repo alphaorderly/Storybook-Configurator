@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/react';
-import ColorPicker from './ColorPicker';
+import { ColorPicker } from './ColorPicker';
 import { ComponentProps, useState } from 'react';
 import React from 'react';
 
@@ -14,9 +14,6 @@ const meta: Meta<StoryProps> = {
         },
         setValue: {
             action: 'setValue',
-        },
-        option: {
-            control: 'object',
         },
     },
 };

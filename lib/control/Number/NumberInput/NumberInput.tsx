@@ -3,19 +3,18 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Minus, Plus } from 'lucide-react';
+import type { CommonProps } from '@/types/Props';
 
 type NumberInputProps = {
     key: number;
-    title: string;
-    description: string;
     value: number;
-    setValue: React.Dispatch<React.SetStateAction<number>>;
+    setValue: (value: number) => void;
     option?: {
         min?: number;
         max?: number;
         step?: number;
     };
-};
+} & CommonProps;
 
 export const NumberInput: React.FC<NumberInputProps> = ({
     title,
@@ -49,7 +48,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({
 
     return (
         <Card className="w-full p-4">
-            <CardHeader className="p-0 mb-4">
+            <CardHeader className="p-0 mb-4 space-y-2">
                 <CardTitle className="text-sm font-medium">{title}</CardTitle>
                 <CardDescription className="text-xs">{description}</CardDescription>
             </CardHeader>

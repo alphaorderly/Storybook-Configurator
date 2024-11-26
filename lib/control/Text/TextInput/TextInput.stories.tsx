@@ -1,5 +1,5 @@
 import { ComponentProps } from 'react';
-import TextInput from './TextInput';
+import { TextInput } from './TextInput';
 import { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 

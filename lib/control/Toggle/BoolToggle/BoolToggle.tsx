@@ -1,25 +1,20 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { ToggleRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import type { CommonProps } from '@/types/Props';
 
-type CommonControlProps = {
-    title: string;
-    description: string;
-};
-
-type BoolToggleControlProps = CommonControlProps & {
+type BoolToggleProps = {
     value: boolean;
-    setValue: React.Dispatch<React.SetStateAction<boolean>>;
+    setValue: (value: boolean) => void;
     option?: {
         disabled?: boolean;
         onLabel?: string;
         offLabel?: string;
         size?: 'default' | 'large';
     };
-};
+} & CommonProps;
 
-export const BoolToggleControl: React.FC<BoolToggleControlProps> = ({
+export const BoolToggle: React.FC<BoolToggleProps> = ({
     title,
     description,
     value,
@@ -31,16 +26,14 @@ export const BoolToggleControl: React.FC<BoolToggleControlProps> = ({
     const size = option?.size || 'default';
 
     return (
-        <Card className="w-full">
-            <CardHeader>
-                <div className="flex items-center space-x-2">
-                    <div>
-                        <CardTitle className="text-lg">{title}</CardTitle>
-                        <CardDescription>{description}</CardDescription>
-                    </div>
+        <Card className="w-full p-4 space-y-4">
+            <CardHeader className="p-0">
+                <div className="space-y-2">
+                    <CardTitle className="text-sm font-medium">{title}</CardTitle>
+                    <CardDescription className="text-xs">{description}</CardDescription>
                 </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
                 <div className="flex items-center">
                     <div
                         role="group"
@@ -51,7 +44,6 @@ export const BoolToggleControl: React.FC<BoolToggleControlProps> = ({
                             size === 'large' ? 'h-10' : 'h-8',
                         )}
                     >
-                        {/* Sliding Background */}
                         <div
                             className={cn(
                                 'absolute z-0 rounded-md bg-background shadow-sm transition-all duration-200 ease-out',
@@ -60,7 +52,6 @@ export const BoolToggleControl: React.FC<BoolToggleControlProps> = ({
                             )}
                         />
 
-                        {/* OFF Button */}
                         <button
                             onClick={() => !value || setValue(false)}
                             className={cn(
@@ -76,7 +67,6 @@ export const BoolToggleControl: React.FC<BoolToggleControlProps> = ({
                             {offLabel}
                         </button>
 
-                        {/* ON Button */}
                         <button
                             onClick={() => value || setValue(true)}
                             className={cn(

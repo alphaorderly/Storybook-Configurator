@@ -1,29 +1,19 @@
-import React from 'react';
+import React, { type FC } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { PenLine } from 'lucide-react';
+import type { CommonProps } from '@/types/Props';
 
-type CommonControlProps = {
-    title: string;
-    description: string;
-};
-
-type TextInputControlProps = CommonControlProps & {
+type TextInputProps = CommonProps & {
     value: string;
-    setValue: React.Dispatch<React.SetStateAction<string>>;
+    setValue: (value: string) => void;
     option?: {
         placeholder?: string;
         maxLength?: number;
     };
 };
 
-export const TextInputControl = ({
-    title,
-    description,
-    value,
-    setValue,
-    option,
-}: TextInputControlProps) => {
+export const TextInput: FC<TextInputProps> = ({ title, description, value, setValue, option }) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = e.target.value;
         if (option?.maxLength && newValue.length > option.maxLength) return;
@@ -31,15 +21,14 @@ export const TextInputControl = ({
     };
 
     return (
-        <Card className="w-full">
-            <CardHeader>
-                <div className="flex items-center gap-2">
-                    <PenLine className="w-4 h-4 text-muted-foreground" />
-                    <CardTitle className="text-lg">{title}</CardTitle>
+        <Card className="w-full p-4 space-y-4">
+            <CardHeader className="p-0">
+                <div className="space-y-2">
+                    <CardTitle className="text-sm font-medium">{title}</CardTitle>
+                    <CardDescription className="text-xs">{description}</CardDescription>
                 </div>
-                <CardDescription>{description}</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
                 <div className="space-y-2">
                     <Input
                         value={value}

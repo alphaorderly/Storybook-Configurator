@@ -1,30 +1,26 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, type ReactNode } from 'react';
 import Editor from '@monaco-editor/react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Braces, Copy, Check } from 'lucide-react';
+import type { CommonProps } from '@/types/Props';
 
-type CommonControlProps = {
-    title: string;
-    description: string;
-};
-
-type ObjectEditorControlProps<T> = CommonControlProps & {
-    object: T;
-    setObject: React.Dispatch<React.SetStateAction<T>>;
+type ObjectEditorProps<T> = {
+    value: T;
+    setValue: (value: T) => void;
     option?: {
         height?: string;
         readOnly?: boolean;
     };
-};
+} & CommonProps;
 
-export function ObjectEditorControl<T extends object>({
+export const ObjectEditor = <T extends object>({
     title,
     description,
-    object,
-    setObject,
+    value,
+    setValue,
     option,
-}: ObjectEditorControlProps<T>): JSX.Element {
+}: ObjectEditorProps<T>): ReactNode => {
     const [copied, setCopied] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const editorRef = useRef(null);
@@ -36,21 +32,20 @@ export function ObjectEditorControl<T extends object>({
 
         const value = editor.getValue();
         if (value) {
-            navigator.clipboard.writeText(value);
+            navigator.clipboard.writeText(JSON.stringify(JSON.parse(value), null, 2));
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         }
     };
 
     return (
-        <Card className="w-full">
-            <CardHeader>
+        <Card className="w-full p-4 space-y-6">
+            <CardHeader className="p-0">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                        <Braces className="w-4 h-4 text-muted-foreground" />
-                        <div>
-                            <CardTitle className="text-lg">{title}</CardTitle>
-                            <CardDescription>{description}</CardDescription>
+                    <div className="flex justify-between items-center">
+                        <div className="space-y-2">
+                            <CardTitle className="text-sm font-medium">{title}</CardTitle>
+                            <CardDescription className="text-xs">{description}</CardDescription>
                         </div>
                     </div>
                     <Button
@@ -66,12 +61,12 @@ export function ObjectEditorControl<T extends object>({
                     </Button>
                 </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
                 <div className="space-y-2">
                     <Editor
                         height={option?.height || '200px'}
                         defaultLanguage="json"
-                        defaultValue={JSON.stringify(object, null, 2)}
+                        defaultValue={JSON.stringify(value, null, 2)}
                         options={{
                             minimap: { enabled: false },
                             fontSize: 14,
@@ -93,7 +88,7 @@ export function ObjectEditorControl<T extends object>({
                                 }
 
                                 const parsed = JSON.parse(value) as T;
-                                setObject(parsed);
+                                setValue(parsed);
                                 setError(null);
                             } catch (err) {
                                 setError('유효하지 않은 JSON 형식입니다.');
@@ -106,4 +101,4 @@ export function ObjectEditorControl<T extends object>({
             </CardContent>
         </Card>
     );
-}
+};

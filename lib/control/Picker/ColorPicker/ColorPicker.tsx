@@ -1,132 +1,123 @@
-import React, { forwardRef, useMemo, useState } from 'react';
+import React, { useMemo, useState, type FC } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Paintbrush } from 'lucide-react';
+import type { CommonProps } from '@/types/Props';
 
-type CommonControlProps = {
-    title: string;
-    description: string;
-};
-
-type ColorPickerProps = CommonControlProps & {
+type ColorPickerProps = {
     value: string;
-    setValue: React.Dispatch<React.SetStateAction<string>>;
-};
+    setValue: (value: string) => void;
+} & CommonProps;
 
-export const ColorPicker = forwardRef<HTMLInputElement, ColorPickerProps>(
-    ({ title, description, value, setValue }, ref) => {
-        const [open, setOpen] = useState(false);
+export const ColorPicker: FC<ColorPickerProps> = ({ title, description, value, setValue }) => {
+    const [open, setOpen] = useState(false);
 
-        const parsedValue = useMemo(() => {
-            return value || '#FFFFFF';
-        }, [value]);
+    const parsedValue = useMemo(() => {
+        return value || '#FFFFFF';
+    }, [value]);
 
-        const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            const newValue = e.target.value;
-            if (newValue.startsWith('#') && newValue.length <= 7) {
-                setValue(newValue.toUpperCase());
-            } else if (!newValue.startsWith('#') && newValue.length <= 6) {
-                setValue(`#${newValue.toUpperCase()}`);
-            }
-        };
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value;
+        if (newValue.startsWith('#') && newValue.length <= 7) {
+            setValue(newValue.toUpperCase());
+        } else if (!newValue.startsWith('#') && newValue.length <= 6) {
+            setValue(`#${newValue.toUpperCase()}`);
+        }
+    };
 
-        return (
-            <Card className="w-full">
-                <CardHeader>
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                            <Paintbrush className="w-4 h-4 text-muted-foreground" />
-                            <div>
-                                <CardTitle className="text-lg">{title}</CardTitle>
-                                <CardDescription>{description}</CardDescription>
-                            </div>
-                        </div>
-                        <Popover
-                            open={open}
-                            onOpenChange={setOpen}
-                        >
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className="w-10 h-10"
-                                    style={{ backgroundColor: parsedValue }}
-                                    onClick={() => setOpen(true)}
-                                >
-                                    <div />
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="p-4 w-64">
-                                <div className="space-y-4">
-                                    {/* Color Gradient Area */}
-                                    <div
-                                        className="w-full h-32 rounded-md cursor-crosshair relative"
-                                        style={{
-                                            backgroundImage: `
+    return (
+        <Card className="w-full p-4">
+            <CardHeader className="p-0">
+                <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+                        <CardDescription className="text-xs">{description}</CardDescription>
+                    </div>
+
+                    <Popover
+                        open={open}
+                        onOpenChange={setOpen}
+                    >
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                className="w-10 h-10"
+                                style={{ backgroundColor: parsedValue }}
+                                onClick={() => setOpen(true)}
+                            >
+                                <div />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="p-4 w-64">
+                            <div className="space-y-4">
+                                {/* Color Gradient Area */}
+                                <div
+                                    className="w-full h-32 rounded-md cursor-crosshair relative"
+                                    style={{
+                                        backgroundImage: `
                       linear-gradient(to bottom, transparent, #000),
                       linear-gradient(to right, #fff, transparent)
                     `,
-                                            backgroundColor: parsedValue,
-                                        }}
-                                        onClick={(e) => {
-                                            const rect = e.currentTarget.getBoundingClientRect();
-                                            const x = e.clientX - rect.left;
-                                            const y = e.clientY - rect.top;
+                                        backgroundColor: parsedValue,
+                                    }}
+                                    onClick={(e) => {
+                                        const rect = e.currentTarget.getBoundingClientRect();
+                                        const x = e.clientX - rect.left;
+                                        const y = e.clientY - rect.top;
 
-                                            // 클릭 위치에 따른 색상 계산 로직
-                                            const saturation = (x / rect.width) * 100;
-                                            const brightness = 100 - (y / rect.height) * 100;
+                                        // 클릭 위치에 따른 색상 계산 로직
+                                        const saturation = (x / rect.width) * 100;
+                                        const brightness = 100 - (y / rect.height) * 100;
 
-                                            // HSB to Hex 변환 로직 (간단한 버전)
-                                            const rgb = hsb2rgb(
-                                                extractHue(parsedValue),
-                                                saturation,
-                                                brightness,
-                                            );
-                                            const hex = rgb2hex(rgb.r, rgb.g, rgb.b);
-                                            setValue(hex);
-                                        }}
-                                    />
+                                        // HSB to Hex 변환 로직 (간단한 버전)
+                                        const rgb = hsb2rgb(
+                                            extractHue(parsedValue),
+                                            saturation,
+                                            brightness,
+                                        );
+                                        const hex = rgb2hex(rgb.r, rgb.g, rgb.b);
+                                        setValue(hex);
+                                    }}
+                                />
 
-                                    {/* Hue Slider */}
-                                    <div
-                                        className="w-full h-3 rounded-md cursor-pointer"
-                                        style={{
-                                            background:
-                                                'linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00)',
-                                        }}
-                                        onClick={(e) => {
-                                            const rect = e.currentTarget.getBoundingClientRect();
-                                            const x = e.clientX - rect.left;
-                                            const hue = (x / rect.width) * 360;
+                                {/* Hue Slider */}
+                                <div
+                                    className="w-full h-3 rounded-md cursor-pointer"
+                                    style={{
+                                        background:
+                                            'linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00)',
+                                    }}
+                                    onClick={(e) => {
+                                        const rect = e.currentTarget.getBoundingClientRect();
+                                        const x = e.clientX - rect.left;
+                                        const hue = (x / rect.width) * 360;
 
-                                            // 현재 채도와 밝기를 유지하면서 색조만 변경
-                                            const { s, b } = hex2hsb(parsedValue);
-                                            const rgb = hsb2rgb(hue, s, b);
-                                            const hex = rgb2hex(rgb.r, rgb.g, rgb.b);
-                                            setValue(hex);
-                                        }}
-                                    />
+                                        // 현재 채도와 밝기를 유지하면서 색조만 변경
+                                        const { s, b } = hex2hsb(parsedValue);
+                                        const rgb = hsb2rgb(hue, s, b);
+                                        const hex = rgb2hex(rgb.r, rgb.g, rgb.b);
+                                        setValue(hex);
+                                    }}
+                                />
 
-                                    {/* Hex Input */}
-                                    <Input
-                                        ref={ref}
-                                        value={parsedValue}
-                                        onChange={handleInputChange}
-                                        maxLength={7}
-                                        className="font-mono"
-                                    />
-                                </div>
-                            </PopoverContent>
-                        </Popover>
-                    </div>
-                </CardHeader>
-            </Card>
-        );
-    },
-);
+                                {/* Hex Input */}
+                                <Input
+                                    value={parsedValue}
+                                    onChange={handleInputChange}
+                                    maxLength={7}
+                                    className="font-mono"
+                                />
+                            </div>
+                        </PopoverContent>
+                    </Popover>
+                </div>
+            </CardHeader>
+        </Card>
+    );
+};
 
 ColorPicker.displayName = 'ColorPicker';
 
