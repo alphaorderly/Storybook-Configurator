@@ -7,7 +7,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { TextSelect } from 'lucide-react';
 import type { CommonProps } from '@/types/Props';
 
 type TextSelectorProps = CommonProps & {
