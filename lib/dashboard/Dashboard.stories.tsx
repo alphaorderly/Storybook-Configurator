@@ -63,6 +63,9 @@ export const Default: Story = {
                 key="numberslider"
                 value={state.numberslider}
                 setValue={(value: number) => setState('numberslider', value)}
+                option={{
+                    showInput: false,
+                }}
             />,
             <ObjectEditor
                 title="Object Editor"

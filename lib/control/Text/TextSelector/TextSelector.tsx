@@ -11,25 +11,25 @@ import { TextSelect } from 'lucide-react';
 import type { CommonProps } from '@/types/Props';
 
 type TextSelectorProps = CommonProps & {
-    selected: string;
-    setSelected: (value: string) => void;
+    value: string;
+    setValue: (value: string) => void;
     select: string[];
 };
 
 export const TextSelector: React.FC<TextSelectorProps> = ({
     title,
     description,
-    selected,
-    setSelected,
+    value,
+    setValue,
     select,
 }) => {
     React.useEffect(() => {
-        if (!selected && select.length > 0) {
-            if (select.includes(selected)) {
-                setSelected(selected);
+        if (!value && select.length > 0) {
+            if (select.includes(value)) {
+                setValue(value);
             }
         }
-    }, [select, selected, setSelected]);
+    }, [select, value, setValue]);
 
     return (
         <Card className="w-full p-4 space-y-4">
@@ -41,11 +41,11 @@ export const TextSelector: React.FC<TextSelectorProps> = ({
             </CardHeader>
             <CardContent className="p-0">
                 <Select
-                    value={selected}
-                    onValueChange={setSelected}
+                    value={value}
+                    onValueChange={setValue}
                 >
                     <SelectTrigger className="w-full">
-                        <SelectValue placeholder={selected} />
+                        <SelectValue placeholder={value} />
                     </SelectTrigger>
                     <SelectContent>
                         {select.map((item) => (

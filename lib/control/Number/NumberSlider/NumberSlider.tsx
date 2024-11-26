@@ -62,6 +62,7 @@ export const NumberSlider: React.FC<NumberSliderProps> = ({
                             className="w-24"
                         />
                     )}
+                    {showInput || <div className="text-sm font-medium">{value}</div>}
                 </div>
             </CardContent>
         </Card>
