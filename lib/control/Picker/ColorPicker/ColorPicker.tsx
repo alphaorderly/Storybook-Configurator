@@ -1,31 +1,74 @@
-import React, { useMemo, useState, type FC } from 'react';
+import React, { useState, useMemo, type FC } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Paintbrush } from 'lucide-react';
 import type { CommonProps } from '@/types/Props';
 
+// Utility Functions
+const hsb2hex = (h: number, s: number, b: number): string => {
+    const c = (b / 100) * (s / 100);
+    const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+    const m = b / 100 - c;
+    const [r, g, b2] =
+        h < 60
+            ? [c, x, 0]
+            : h < 120
+              ? [x, c, 0]
+              : h < 180
+                ? [0, c, x]
+                : h < 240
+                  ? [0, x, c]
+                  : h < 300
+                    ? [x, 0, c]
+                    : [c, 0, x];
+    return `#${[r, g, b2]
+        .map((v) =>
+            Math.round((v + m) * 255)
+                .toString(16)
+                .padStart(2, '0'),
+        )
+        .join('')
+        .toUpperCase()}`;
+};
+
+const hex2hsb = (hex: string) => {
+    const [r, g, b] = hex.match(/\w\w/g)?.map((x) => parseInt(x, 16) / 255) || [0, 0, 0];
+    if (r === undefined || g === undefined || b === undefined) {
+        return { h: 0, s: 0, b: 0 };
+    }
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const delta = max - min;
+    const h = delta
+        ? max === r
+            ? ((g - b) / delta) % 6
+            : max === g
+              ? (b - r) / delta + 2
+              : (r - g) / delta + 4
+        : 0;
+    const s = max ? (delta / max) * 100 : 0;
+    return { h: Math.round(h * 60), s: Math.round(s), b: Math.round(max * 100) };
+};
+
+// Component
 type ColorPickerProps = {
     value: string;
     setValue: (value: string) => void;
 } & CommonProps;
 
 export const ColorPicker: FC<ColorPickerProps> = ({ title, description, value, setValue }) => {
-    const [open, setOpen] = useState(false);
+    const [hue, setHue] = useState(() => hex2hsb(value).h); // Controls hue (slider)
+    const [saturation, setSaturation] = useState(() => hex2hsb(value).s); // Controls saturation
+    const [brightness, setBrightness] = useState(() => hex2hsb(value).b); // Controls brightness
 
-    const parsedValue = useMemo(() => {
-        return value || '#FFFFFF';
-    }, [value]);
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newValue = e.target.value;
-        if (newValue.startsWith('#') && newValue.length <= 7) {
-            setValue(newValue.toUpperCase());
-        } else if (!newValue.startsWith('#') && newValue.length <= 6) {
-            setValue(`#${newValue.toUpperCase()}`);
-        }
+    // Update HEX value based on HSB changes
+    const updateHex = (newHue: number, newSaturation: number, newBrightness: number) => {
+        setValue(hsb2hex(newHue, newSaturation, newBrightness));
     };
+
+    // Update Gradient (Saturation/Brightness stays constant, only background depends on hue)
+    const gradientBackground = useMemo(() => hsb2hex(hue, 100, 100), [hue]);
 
     return (
         <Card className="w-full p-4">
@@ -35,51 +78,44 @@ export const ColorPicker: FC<ColorPickerProps> = ({ title, description, value, s
                         <CardTitle className="text-sm font-medium">{title}</CardTitle>
                         <CardDescription className="text-xs">{description}</CardDescription>
                     </div>
-
-                    <Popover
-                        open={open}
-                        onOpenChange={setOpen}
-                    >
+                    <Popover>
                         <PopoverTrigger asChild>
                             <Button
                                 variant="outline"
                                 size="icon"
                                 className="w-10 h-10"
-                                style={{ backgroundColor: parsedValue }}
-                                onClick={() => setOpen(true)}
-                            >
-                                <div />
-                            </Button>
+                                style={{ backgroundColor: value }}
+                            />
                         </PopoverTrigger>
                         <PopoverContent className="p-4 w-64">
                             <div className="space-y-4">
-                                {/* Color Gradient Area */}
+                                {/* Saturation/Brightness Selector */}
                                 <div
                                     className="w-full h-32 rounded-md cursor-crosshair relative"
                                     style={{
                                         backgroundImage: `
-                      linear-gradient(to bottom, transparent, #000),
-                      linear-gradient(to right, #fff, transparent)
-                    `,
-                                        backgroundColor: parsedValue,
+                                            linear-gradient(to bottom, transparent, #000),
+                                            linear-gradient(to right, #fff, transparent)
+                                        `,
+                                        backgroundColor: gradientBackground,
                                     }}
                                     onClick={(e) => {
                                         const rect = e.currentTarget.getBoundingClientRect();
-                                        const x = e.clientX - rect.left;
-                                        const y = e.clientY - rect.top;
-
-                                        // 클릭 위치에 따른 색상 계산 로직
-                                        const saturation = (x / rect.width) * 100;
-                                        const brightness = 100 - (y / rect.height) * 100;
-
-                                        // HSB to Hex 변환 로직 (간단한 버전)
-                                        const rgb = hsb2rgb(
-                                            extractHue(parsedValue),
-                                            saturation,
-                                            brightness,
+                                        const x = Math.min(
+                                            Math.max(0, e.clientX - rect.left),
+                                            rect.width,
                                         );
-                                        const hex = rgb2hex(rgb.r, rgb.g, rgb.b);
-                                        setValue(hex);
+                                        const y = Math.min(
+                                            Math.max(0, e.clientY - rect.top),
+                                            rect.height,
+                                        );
+                                        const newSaturation = Math.round((x / rect.width) * 100);
+                                        const newBrightness = Math.round(
+                                            100 - (y / rect.height) * 100,
+                                        );
+                                        setSaturation(newSaturation);
+                                        setBrightness(newBrightness);
+                                        updateHex(hue, newSaturation, newBrightness);
                                     }}
                                 />
 
@@ -92,21 +128,29 @@ export const ColorPicker: FC<ColorPickerProps> = ({ title, description, value, s
                                     }}
                                     onClick={(e) => {
                                         const rect = e.currentTarget.getBoundingClientRect();
-                                        const x = e.clientX - rect.left;
-                                        const hue = (x / rect.width) * 360;
-
-                                        // 현재 채도와 밝기를 유지하면서 색조만 변경
-                                        const { s, b } = hex2hsb(parsedValue);
-                                        const rgb = hsb2rgb(hue, s, b);
-                                        const hex = rgb2hex(rgb.r, rgb.g, rgb.b);
-                                        setValue(hex);
+                                        const x = Math.min(
+                                            Math.max(0, e.clientX - rect.left),
+                                            rect.width,
+                                        );
+                                        const newHue = Math.round((x / rect.width) * 360);
+                                        setHue(newHue);
+                                        updateHex(newHue, saturation, brightness);
                                     }}
                                 />
 
-                                {/* Hex Input */}
+                                {/* HEX Input */}
                                 <Input
-                                    value={parsedValue}
-                                    onChange={handleInputChange}
+                                    value={value}
+                                    onChange={(e) => {
+                                        const hex = e.target.value.toUpperCase();
+                                        if (/^#([A-F0-9]{6})$/.test(hex)) {
+                                            const { h, s, b } = hex2hsb(hex);
+                                            setHue(h);
+                                            setSaturation(s);
+                                            setBrightness(b);
+                                            setValue(hex);
+                                        }
+                                    }}
                                     maxLength={7}
                                     className="font-mono"
                                 />
@@ -120,105 +164,3 @@ export const ColorPicker: FC<ColorPickerProps> = ({ title, description, value, s
 };
 
 ColorPicker.displayName = 'ColorPicker';
-
-// Color conversion utilities
-function hex2hsb(hex: string): { h: number; s: number; b: number } {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    if (!result) return { h: 0, s: 0, b: 0 };
-
-    const r = parseInt(result[1] ?? '00', 16) / 255;
-    const g = parseInt(result[2] ?? '00', 16) / 255;
-    const b = parseInt(result[3] ?? '00', 16) / 255;
-
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    const d = max - min;
-
-    let h = 0;
-    const s = max === 0 ? 0 : d / max;
-    const v = max;
-
-    if (max !== min) {
-        switch (max) {
-            case r:
-                h = (g - b) / d + (g < b ? 6 : 0);
-                break;
-            case g:
-                h = (b - r) / d + 2;
-                break;
-            case b:
-                h = (r - g) / d + 4;
-                break;
-        }
-        h /= 6;
-    }
-
-    return {
-        h: h * 360,
-        s: s * 100,
-        b: v * 100,
-    };
-}
-
-function hsb2rgb(h: number, s: number, v: number): { r: number; g: number; b: number } {
-    h = (h % 360) / 60;
-    s = s / 100;
-    v = v / 100;
-
-    const i = Math.floor(h);
-    const f = h - i;
-    const p = v * (1 - s);
-    const q = v * (1 - s * f);
-    const t = v * (1 - s * (1 - f));
-
-    let r = 0,
-        g = 0,
-        b = 0;
-
-    switch (i) {
-        case 0:
-            r = v;
-            g = t;
-            b = p;
-            break;
-        case 1:
-            r = q;
-            g = v;
-            b = p;
-            break;
-        case 2:
-            r = p;
-            g = v;
-            b = t;
-            break;
-        case 3:
-            r = p;
-            g = q;
-            b = v;
-            break;
-        case 4:
-            r = t;
-            g = p;
-            b = v;
-            break;
-        default:
-            r = v;
-            g = p;
-            b = q;
-            break;
-    }
-
-    return {
-        r: Math.round(r * 255),
-        g: Math.round(g * 255),
-        b: Math.round(b * 255),
-    };
-}
-
-function rgb2hex(r: number, g: number, b: number): string {
-    return `#${[r, g, b].map((x) => x.toString(16).padStart(2, '0')).join('')}`.toUpperCase();
-}
-
-function extractHue(hex: string): number {
-    return hex2hsb(hex).h;
-}
