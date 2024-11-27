@@ -7,7 +7,7 @@ import type { CommonProps } from '@/types/Props';
 
 type ObjectEditorProps<T> = {
     value: T;
-    setValue: (value: T) => void;
+    setValue: React.Dispatch<React.SetStateAction<T>>;
     option?: {
         height?: string;
         readOnly?: boolean;

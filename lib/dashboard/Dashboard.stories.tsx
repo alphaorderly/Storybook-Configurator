@@ -36,7 +36,7 @@ export const Default: Story = {
             colorpicker: '#ff0000',
             textarray: ['one', 'two', 'three'],
             textinput: 'text',
-            textselect: 'one',
+            textselect: 'o',
             booltoggle: true,
         });
 
@@ -48,21 +48,21 @@ export const Default: Story = {
                 description="Modify an array of numbers"
                 key="numberarray"
                 value={state.numberarray}
-                setValue={(value: number[]) => setState('numberarray', value)}
+                setValue={setState.numberarray}
             />,
             <NumberInput
                 title="Number Input"
                 description="Input a single number"
                 key="numberinput"
                 value={state.numberinput}
-                setValue={(value: number) => setState('numberinput', value)}
+                setValue={setState.numberinput}
             />,
             <NumberSlider
                 title="Number Slider"
                 description="Slide to select a number"
                 key="numberslider"
                 value={state.numberslider}
-                setValue={(value: number) => setState('numberslider', value)}
+                setValue={setState.numberslider}
                 option={{
                     showInput: false,
                 }}
@@ -72,36 +72,35 @@ export const Default: Story = {
                 description="Edit an object"
                 key="objecteditor"
                 value={state.objecteditor}
-                setValue={(value: unknown) => setState('objecteditor', value)}
+                setValue={setState.objecteditor}
             />,
             <ColorPicker
                 title="Color Picker"
                 description="Pick a color"
                 key="colorpicker"
                 value={state.colorpicker}
-                setValue={(value: string) => setState('colorpicker', value)}
+                setValue={setState.colorpicker}
             />,
             <TextArray
                 title="Text Array"
                 description="Modify an array of text"
                 key="textarray"
                 value={state.textarray}
-                setValue={(value: string[]) => setState('textarray', value)}
+                setValue={setState.textarray}
             />,
             <TextInput
                 title="Text Input"
                 description="Input a single text"
                 key="textinput"
                 value={state.textinput}
-                setValue={(value: string) => setState('textinput', value)}
+                setValue={setState.textinput}
             />,
             <TextSelector
                 title="Text Selector"
                 description="Select a text from options"
                 key="textselect"
                 value={state.textselect}
-                selected={state.textselect}
-                setSelected={(value: string) => setState('textselect', value)}
+                setValue={setState.textselect}
                 select={textselectOptions}
             />,
             <BoolToggle
@@ -109,7 +108,7 @@ export const Default: Story = {
                 description="Toggle a boolean value"
                 key="booltoggle"
                 value={state.booltoggle}
-                setValue={(value: boolean) => setState('booltoggle', value)}
+                setValue={setState.booltoggle}
             />,
         ];
 
@@ -119,7 +118,23 @@ export const Default: Story = {
                 title="Dashboard"
                 description="This is Dashboard for storybook"
             >
-                <input type="text" />
+                <div>
+                    <h2>Interactive Controls</h2>
+                    <ul>
+                        <li>Number Array: {state.numberarray.join(', ')}</li>
+                        <li>Number Input: {state.numberinput}</li>
+                        <li>Number Slider: {state.numberslider}</li>
+                        <li>Object Editor: {JSON.stringify(state.objecteditor)}</li>
+                        <li>
+                            Color Picker:{' '}
+                            <span style={{ color: state.colorpicker }}>{state.colorpicker}</span>
+                        </li>
+                        <li>Text Array: {state.textarray.join(', ')}</li>
+                        <li>Text Input: {state.textinput}</li>
+                        <li>Text Selector: {state.textselect}</li>
+                        <li>Boolean Toggle: {state.booltoggle ? 'true' : 'false'}</li>
+                    </ul>
+                </div>
             </Dashboard>
         );
     },

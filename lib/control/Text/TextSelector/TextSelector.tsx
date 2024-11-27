@@ -11,7 +11,7 @@ import type { CommonProps } from '@/types/Props';
 
 type TextSelectorProps = CommonProps & {
     value: string;
-    setValue: (value: string) => void;
+    setValue: React.Dispatch<React.SetStateAction<string>>;
     select: string[];
 };
 
@@ -23,10 +23,8 @@ export const TextSelector: React.FC<TextSelectorProps> = ({
     select,
 }) => {
     React.useEffect(() => {
-        if (!value && select.length > 0) {
-            if (select.includes(value)) {
-                setValue(value);
-            }
+        if (!value || !select.includes(value)) {
+            if (select.length > 0) setValue(select[0] ?? '');
         }
     }, [select, value, setValue]);
 

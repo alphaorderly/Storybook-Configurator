@@ -1,6 +1,6 @@
 # Storybook Configurator
 
-A powerful tool to set up your stories interactively and easily.
+A versatile tool to set up your components interactively and efficiently.
 
 ## Table of Contents
 
@@ -10,7 +10,7 @@ A powerful tool to set up your stories interactively and easily.
 
 ## Common Props
 
-All components share these base props:
+The following props are shared across all components:
 
 | Prop          | Type   | Description                  |
 | ------------- | ------ | ---------------------------- |
@@ -19,35 +19,146 @@ All components share these base props:
 
 ## Dashboard Component
 
-![picture 11](images/b6fead041fd8efb0ef39f1efee8a6f27e304305b58fa3afede290aa8c7b16d4c.png)
+<img width="2354" alt="image" src="https://github.com/user-attachments/assets/4d773c35-e3a8-4004-8011-df89d99f1e5c">
 
-The Dashboard component serves as the main container for your interactive stories.
+The Dashboard component acts as the primary container for your interactive stories.
 
 ### Props
 
 | Prop       | Type                 | Description                                          |
 | ---------- | -------------------- | ---------------------------------------------------- |
-| `controls` | Control[]            | Array of control components to be placed on the left |
-| `options`  | { minWidth: number } | Configuration options for the dashboard              |
+| `controls` | ReactNode[]          | Array of control components to be placed on the left |
+| `option`   | { minWidth: number } | Configuration option for the dashboard               |
 | `children` | ReactNode            | Components to display in the main area               |
+
+#### option
+
+-   minWidth : minimum width of control section
 
 ### Example Usage
 
+<details>
+<summary>Example Usage</summary>
+
 ```tsx
-<Dashboard
-    controls={controls}
-    title="Dashboard"
-    description="This is Dashboard for storybook"
->
-    <YourComponent />
-</Dashboard>
+const [state, setState] = useControlState({
+    numberarray: [1, 2, 3],
+    numberinput: 1,
+    numberslider: 1,
+    objecteditor: { key: 'value' },
+    colorpicker: '#ff0000',
+    textarray: ['one', 'two', 'three'],
+    textinput: 'text',
+    textselect: 'o',
+    booltoggle: true,
+});
+
+const textselectOptions = ['one', 'two', 'three'];
+
+const controls = [
+    <NumberArray
+        title="Number Array"
+        description="Modify an array of numbers"
+        key="numberarray"
+        value={state.numberarray}
+        setValue={setState.numberarray}
+    />,
+    <NumberInput
+        title="Number Input"
+        description="Input a single number"
+        key="numberinput"
+        value={state.numberinput}
+        setValue={setState.numberinput}
+    />,
+    <NumberSlider
+        title="Number Slider"
+        description="Slide to select a number"
+        key="numberslider"
+        value={state.numberslider}
+        setValue={setState.numberslider}
+        option={{
+            showInput: false,
+        }}
+    />,
+    <ObjectEditor
+        title="Object Editor"
+        description="Edit an object"
+        key="objecteditor"
+        value={state.objecteditor}
+        setValue={setState.objecteditor}
+    />,
+    <ColorPicker
+        title="Color Picker"
+        description="Pick a color"
+        key="colorpicker"
+        value={state.colorpicker}
+        setValue={setState.colorpicker}
+    />,
+    <TextArray
+        title="Text Array"
+        description="Modify an array of text"
+        key="textarray"
+        value={state.textarray}
+        setValue={setState.textarray}
+    />,
+    <TextInput
+        title="Text Input"
+        description="Input a single text"
+        key="textinput"
+        value={state.textinput}
+        setValue={setState.textinput}
+    />,
+    <TextSelector
+        title="Text Selector"
+        description="Select a text from options"
+        key="textselect"
+        value={state.textselect}
+        setValue={setState.textselect}
+        select={textselectOptions}
+    />,
+    <BoolToggle
+        title="Boolean Toggle"
+        description="Toggle a boolean value"
+        key="booltoggle"
+        value={state.booltoggle}
+        setValue={setState.booltoggle}
+    />,
+];
+
+return (
+    <Dashboard
+        controls={controls}
+        title="Dashboard"
+        description="This is Dashboard for storybook"
+    >
+        <div>
+            <h2>Interactive Controls</h2>
+            <ul>
+                <li>Number Array: {state.numberarray.join(', ')}</li>
+                <li>Number Input: {state.numberinput}</li>
+                <li>Number Slider: {state.numberslider}</li>
+                <li>Object Editor: {JSON.stringify(state.objecteditor)}</li>
+                <li>
+                    Color Picker:{' '}
+                    <span style={{ color: state.colorpicker }}>{state.colorpicker}</span>
+                </li>
+                <li>Text Array: {state.textarray.join(', ')}</li>
+                <li>Text Input: {state.textinput}</li>
+                <li>Text Selector: {state.textselect}</li>
+                <li>Boolean Toggle: {state.booltoggle ? 'true' : 'false'}</li>
+            </ul>
+        </div>
+    </Dashboard>
+);
 ```
+
+</details>
 
 ## State Management
 
 ### useControlState Hook
 
-The `useControlState` hook provides an easy way to manage multiple states for your controls.
+The `useControlState` hook simplifies managing multiple states for controls in your Storybook.
 
 ```tsx
 const [state, setState] = useControlState({
@@ -63,190 +174,296 @@ const [state, setState] = useControlState({
 });
 
 // Usage
-state.numberarray; // Get state value
-setState('numberarray', newValue); // Set state value
+state.numberarray; // Get the current state value
+
+setState.numberarray([1, 3]); // Update the state with a new array
+setState.numberarray((prev) => prev.filter((item) => item !== 1)); // Works like useState
 ```
 
 ## Control Components
 
 ### 1. NumberArray
 
-![picture 12](images/0a4a92f6e7d8d9c53f48474db8021d31adcf7950da0ba12fc5d4771c26ebfdc8.png)
+<img width="291" alt="image" src="https://github.com/user-attachments/assets/46c61c79-66c2-4381-b365-7c87933265e9">
 
-A component to modify an array of numbers.
+A component for modifying an array of numbers.
+
+#### Example
 
 ```tsx
 <NumberArray
     title="Number Array"
     description="Modify an array of numbers"
+    key="numberarray"
     value={state.numberarray}
-    setValue={(value: number[]) => setState('numberarray', value)}
+    setValue={setState.numberarray}
 />
 ```
 
+#### Type
+
+| Property   | Type                               | Required | Description              |
+| ---------- | ---------------------------------- | -------- | ------------------------ |
+| `value`    | number[]                           | Yes      | Current array of numbers |
+| `setValue` | Dispatch<SetStateAction<number[]>> | Yes      | State setter function    |
+
 ### 2. NumberInput
 
-![picture 14](images/8070eb0491350db5089e2e87687593e8f6375366ce47d12b6a1af095d41e6deb.png)
+<img width="290" alt="image" src="https://github.com/user-attachments/assets/8e22ef0a-1759-4468-8be5-d0e7d9e3cd66">
 
-Input component for single number values.
+A component for entering a single numeric value.
 
-#### Options
+#### Option
 
 ```tsx
-type NumberInputOptions = {
-    min?: number; // Minimum possible value
-    max?: number; // Maximum possible value
-    step?: number; // Step for click event
+option?: {
+    min?: number;
+    // Minimum allowable input
+    max?: number;
+    // Maximum allowable input
+    step?: number;
+    // Step intervals for the input buttons
 };
 ```
+
+#### Example
 
 ```tsx
 <NumberInput
     title="Number Input"
     description="Input a single number"
+    key="numberinput"
     value={state.numberinput}
-    setValue={(value: number) => setState('numberinput', value)}
-    options={{ min: 0, max: 100, step: 1 }}
+    setValue={setState.numberinput}
 />
 ```
 
+#### Type
+
+| Property   | Type                              | Required | Description           |
+| ---------- | --------------------------------- | -------- | --------------------- |
+| `value`    | number                            | Yes      | Current number value  |
+| `setValue` | Dispatch<SetStateAction<number\>> | Yes      | State setter function |
+| `option`   | option                            | No       | Configuration options |
+
 ### 3. NumberSlider
 
-![picture 15](images/e18b6844f8ad9282c821725ad57477328a8742ec8a67121bdde3237ff514bd79.png)
+<img width="286" alt="image" src="https://github.com/user-attachments/assets/ca8f5a8b-b77d-482c-82e1-494d198c6843">
 
-A slider component for number values.
+A slider for selecting numeric values.
 
-#### Options
+#### Option
 
 ```tsx
-type NumberSliderOptions = {
-    min?: number; // Minimum possible value
-    max?: number; // Maximum possible value
-    step?: number; // Step for slider
-    showInput?: boolean; // Show explicit input
+option?: {
+    min?: number;
+    // Minimum slider value
+    max?: number;
+    // Maximum slider value
+    step?: number;
+    // Step increment for the slider
+    showInput?: boolean;
+    // Display an input box below the slider
 };
 ```
+
+#### Example
 
 ```tsx
 <NumberSlider
     title="Number Slider"
     description="Slide to select a number"
+    key="numberslider"
     value={state.numberslider}
-    setValue={(value: number) => setState('numberslider', value)}
-    options={{ min: 0, max: 100, step: 1, showInput: true }}
+    setValue={setState.numberslider}
+    option={{
+        showInput: false,
+    }}
 />
 ```
 
+#### Type
+
+| Property   | Type                              | Required | Description                  |
+| ---------- | --------------------------------- | -------- | ---------------------------- |
+| `value`    | number                            | Yes      | Current slider value         |
+| `setValue` | Dispatch<SetStateAction<number\>> | Yes      | State setter function        |
+| `option`   | option                            | No       | Slider configuration options |
+
 ### 4. ObjectEditor
 
-![picture 16](images/763ce868e7665b367d7de8c9697eebf964361b2827e104266e812dbed109fe75.png)
+<img width="291" alt="image" src="https://github.com/user-attachments/assets/f60cde83-7937-4e6b-9fc8-6d671b12d81a">
 
-An editor for objects and arrays.
+A component for editing objects and arrays.
 
-#### Options
+#### Option
 
 ```tsx
-type ObjectEditorOptions = {
-    height?: string; // Height for editor
-    readOnly?: boolean; // Read only flag
+option?: {
+    height?: string;
+    // Editor display height
+    readOnly?: boolean;
+    // Specifies if the editor is read-only
 };
 ```
+
+#### Example
 
 ```tsx
 <ObjectEditor
     title="Object Editor"
     description="Edit an object"
+    key="objecteditor"
     value={state.objecteditor}
-    setValue={(value: unknown) => setState('objecteditor', value)}
-    options={{ height: '300px' }}
+    setValue={setState.objecteditor}
 />
 ```
 
+#### Type
+
+| Property   | Type                               | Required | Description                  |
+| ---------- | ---------------------------------- | -------- | ---------------------------- |
+| `value`    | unknown                            | Yes      | Current object value         |
+| `setValue` | Dispatch<SetStateAction<unknown\>> | Yes      | State setter function        |
+| `option`   | ObjectEditorOptions                | No       | Editor configuration options |
+
 ### 5. ColorPicker
 
-![picture 17](images/2dafdfac91fe7248a295863dce811541cd582837e0b42d9c10bc3697d10a6a82.png)
+<img width="288" alt="image" src="https://github.com/user-attachments/assets/a9311081-cecd-4be3-b16a-9845fb52fd7c">
 
-A component for selecting colors.
+A component for selecting and displaying colors.
+
+#### Example
 
 ```tsx
 <ColorPicker
     title="Color Picker"
     description="Pick a color"
+    key="colorpicker"
     value={state.colorpicker}
-    setValue={(value: string) => setState('colorpicker', value)}
+    setValue={setState.colorpicker}
 />
 ```
 
+#### Type
+
+| Property   | Type                              | Required | Description                      |
+| ---------- | --------------------------------- | -------- | -------------------------------- |
+| `value`    | string                            | Yes      | Current color value (hex format) |
+| `setValue` | Dispatch<SetStateAction<string\>> | Yes      | State setter function            |
+
 ### 6. TextArray
 
-![picture 18](images/b824760daeaa98cf0e5d59c9cbbaf8867e46ce4bcc879178ee3ea58aa7932719.png)
+<img width="287" alt="image" src="https://github.com/user-attachments/assets/630b1519-2eb5-474f-aeee-9d167f46cc78">
 
-Modify an array of text values.
+A component for managing an array of text values.
+
+#### Example
 
 ```tsx
 <TextArray
     title="Text Array"
     description="Modify an array of text"
+    key="textarray"
     value={state.textarray}
-    setValue={(value: string[]) => setState('textarray', value)}
+    setValue={setState.textarray}
 />
 ```
 
+#### Type
+
+| Property   | Type                               | Required | Description              |
+| ---------- | ---------------------------------- | -------- | ------------------------ |
+| `value`    | string[]                           | Yes      | Current array of strings |
+| `setValue` | Dispatch<SetStateAction<string[]>> | Yes      | State setter function    |
+
 ### 7. TextInput
 
-![picture 19](images/76d2879d426a67a57bbbfaf9443b1a15c3784cb3a243170c2f729aac9560c525.png)
+<img width="286" alt="image" src="https://github.com/user-attachments/assets/af40d7e5-ed4f-4dcf-8528-d124530a77f9">
 
-Input component for text values.
+A component for entering text values.
 
-#### Options
+#### Option
 
 ```tsx
-type TextInputOptions = {
-    placeholder?: string; // Placeholder for input
-    maxLength?: number; // Maximum length of text
+option?: {
+    placeholder?: string;
+    // Placeholder text for the input field
+    maxLength?: number;
+    // Maximum character length allowed
 };
 ```
+
+#### Example
 
 ```tsx
 <TextInput
     title="Text Input"
     description="Input a single text"
+    key="textinput"
     value={state.textinput}
-    setValue={(value: string) => setState('textinput', value)}
-    options={{ placeholder: 'Enter text...', maxLength: 100 }}
+    setValue={setState.textinput}
 />
 ```
 
+#### Type
+
+| Property   | Type                              | Required | Description                 |
+| ---------- | --------------------------------- | -------- | --------------------------- |
+| `value`    | string                            | Yes      | Current text value          |
+| `setValue` | Dispatch<SetStateAction<string\>> | Yes      | State setter function       |
+| `option`   | option                            | No       | Input configuration options |
+
 ### 8. TextSelector
 
-![picture 20](images/98c48ece4529fa61cb228f40b31889cd88358d967d3c5f2aa44f6155d4824447.png)
+<img width="292" alt="image" src="https://github.com/user-attachments/assets/5da97138-fc9b-404b-86d7-adb530452d63">
 
-A dropdown component to select from predefined options.
+A dropdown component for choosing from predefined options.
+
+#### Example
 
 ```tsx
-const options = ['one', 'two', 'three'];
+const textselectOptions = ['one', 'two', 'three'];
 
 <TextSelector
     title="Text Selector"
     description="Select a text from options"
+    key="textselect"
     value={state.textselect}
-    selected={state.textselect}
-    setSelected={(value: string) => setState('textselect', value)}
-    select={options}
+    setValue={setState.textselect}
+    select={textselectOptions}
 />;
 ```
 
+#### Type
+
+| Property   | Type                              | Required | Description                 |
+| ---------- | --------------------------------- | -------- | --------------------------- |
+| `value`    | string                            | Yes      | Current selected value      |
+| `setValue` | Dispatch<SetStateAction<string\>> | Yes      | State setter function       |
+| `select`   | string[]                          | Yes      | Array of selectable options |
+
 ### 9. BoolToggle
 
-![picture 21](images/b5b9f578ce61adbd3fe0dec76d83a6d2b84a34b1d8e8a4637997bd9dec4d3f2e.png)
+<img width="286" alt="image" src="https://github.com/user-attachments/assets/b0fa26fa-3cd1-4146-bbb5-e32ebd2aa60c">
 
-A toggle component for boolean values.
+A switch for toggling boolean values.
+
+#### Example
 
 ```tsx
 <BoolToggle
     title="Boolean Toggle"
     description="Toggle a boolean value"
+    key="booltoggle"
     value={state.booltoggle}
-    setValue={(value: boolean) => setState('booltoggle', value)}
+    setValue={setState.booltoggle}
 />
 ```
+
+#### Type
+
+| Property   | Type                               | Required | Description           |
+| ---------- | ---------------------------------- | -------- | --------------------- |
+| `value`    | boolean                            | Yes      | Current toggle state  |
+| `setValue` | Dispatch<SetStateAction<boolean\>> | Yes      | State setter function |

@@ -1,14 +1,23 @@
 import { useState } from 'react';
 
 export const useControlState = <S extends Record<string, unknown>>(initialState: S) => {
-    const [state, setState] = useState<S>(initialState);
+    const stateEntries = Object.entries(initialState).map(([key, value]) => {
+        const [fieldState, setFieldState] = useState(value);
+        return [key, fieldState, setFieldState] as const;
+    });
 
-    const setControlState = <K extends keyof S>(key: K, value: unknown) => {
-        setState((prev) => ({
-            ...prev,
-            [key]: value,
-        }));
-    };
+    const state = stateEntries.reduce((acc, [key, fieldState]) => {
+        acc[key as keyof S] = fieldState as S[keyof S];
+        return acc;
+    }, {} as S);
 
-    return [state, setControlState] as const;
+    const setStates = stateEntries.reduce(
+        (acc, [key, , setFieldState]) => {
+            acc[key as keyof S] = setFieldState;
+            return acc;
+        },
+        {} as { [K in keyof S]: React.Dispatch<React.SetStateAction<S[K]>> },
+    );
+
+    return [state, setStates] as const;
 };

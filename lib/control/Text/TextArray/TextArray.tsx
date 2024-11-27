@@ -9,7 +9,7 @@ import { twMerge } from 'tailwind-merge';
 
 type TextArrayProps = CommonProps & {
     value: string[];
-    setValue: (value: string[]) => void;
+    setValue: React.Dispatch<React.SetStateAction<string[]>>;
     option?: {
         placeholder?: string;
         maxLength?: number;
