@@ -3,10 +3,11 @@ import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/ca
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch'; // 알파값 사용 여부 선택용 스위치
 import type { CommonProps } from '@/types/Props';
 
 // Utility Functions
-const hsb2hex = (h: number, s: number, b: number): string => {
+const hsb2hex = (h: number, s: number, b: number, a?: number): string => {
     const c = (b / 100) * (s / 100);
     const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
     const m = b / 100 - c;
@@ -22,21 +23,35 @@ const hsb2hex = (h: number, s: number, b: number): string => {
                   : h < 300
                     ? [x, 0, c]
                     : [c, 0, x];
-    return `#${[r, g, b2]
-        .map((v) =>
-            Math.round((v + m) * 255)
-                .toString(16)
-                .padStart(2, '0'),
-        )
-        .join('')
-        .toUpperCase()}`;
+    const rgb = [r, g, b2].map((v) =>
+        Math.round((v + m) * 255)
+            .toString(16)
+            .padStart(2, '0'),
+    );
+
+    if (a !== undefined) {
+        const alpha = Math.round(a * 255)
+            .toString(16)
+            .padStart(2, '0');
+
+        return `#${[...rgb, alpha].join('').toUpperCase()}`;
+    }
+
+    return `#${rgb.join('').toUpperCase()}`;
 };
 
 const hex2hsb = (hex: string) => {
-    const [r, g, b] = hex.match(/\w\w/g)?.map((x) => parseInt(x, 16) / 255) || [0, 0, 0];
+    const [r, g, b, a] = hex.match(/\w\w/g)?.map((x) => parseInt(x, 16) / 255) ?? [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+    ];
+
     if (r === undefined || g === undefined || b === undefined) {
-        return { h: 0, s: 0, b: 0 };
+        return { h: 0, s: 0, b: 0, a: 0 };
     }
+
     const max = Math.max(r, g, b);
     const min = Math.min(r, g, b);
     const delta = max - min;
@@ -48,7 +63,7 @@ const hex2hsb = (hex: string) => {
               : (r - g) / delta + 4
         : 0;
     const s = max ? (delta / max) * 100 : 0;
-    return { h: Math.round(h * 60), s: Math.round(s), b: Math.round(max * 100) };
+    return { h: Math.round(h * 60), s: Math.round(s), b: Math.round(max * 100), a: a };
 };
 
 // Component
@@ -59,16 +74,30 @@ type ColorPickerProps = {
 } & CommonProps;
 
 export const ColorPicker: FC<ColorPickerProps> = ({ title, description, value, setValue }) => {
-    const [hue, setHue] = useState(() => hex2hsb(value).h); // Controls hue (slider)
-    const [saturation, setSaturation] = useState(() => hex2hsb(value).s); // Controls saturation
-    const [brightness, setBrightness] = useState(() => hex2hsb(value).b); // Controls brightness
+    const { h, s, b, a } = hex2hsb(value);
 
-    // Update HEX value based on HSB changes
-    const updateHex = (newHue: number, newSaturation: number, newBrightness: number) => {
-        setValue(hsb2hex(newHue, newSaturation, newBrightness));
+    const [hue, setHue] = useState(h);
+    const [saturation, setSaturation] = useState(s);
+    const [brightness, setBrightness] = useState(b);
+
+    const [alpha, setAlpha] = useState(a);
+    const [useAlpha, setUseAlpha] = useState(value.length === 9);
+
+    const [inputValue, setInputValue] = useState(() =>
+        useAlpha ? value.slice(0, 9) : value.slice(0, 7),
+    );
+
+    const updateHex = (
+        newHue: number,
+        newSaturation: number,
+        newBrightness: number,
+        newAlpha?: number,
+    ) => {
+        const newHex = hsb2hex(newHue, newSaturation, newBrightness, newAlpha);
+        setValue(newHex);
+        setInputValue(useAlpha ? newHex.slice(0, 9) : newHex.slice(0, 7)); // 알파값 제거된 HEX 업데이트
     };
 
-    // Update Gradient (Saturation/Brightness stays constant, only background depends on hue)
     const gradientBackground = useMemo(() => hsb2hex(hue, 100, 100), [hue]);
 
     return (
@@ -116,7 +145,7 @@ export const ColorPicker: FC<ColorPickerProps> = ({ title, description, value, s
                                         );
                                         setSaturation(newSaturation);
                                         setBrightness(newBrightness);
-                                        updateHex(hue, newSaturation, newBrightness);
+                                        updateHex(hue, newSaturation, newBrightness, alpha);
                                     }}
                                 />
 
@@ -135,24 +164,71 @@ export const ColorPicker: FC<ColorPickerProps> = ({ title, description, value, s
                                         );
                                         const newHue = Math.round((x / rect.width) * 360);
                                         setHue(newHue);
-                                        updateHex(newHue, saturation, brightness);
+                                        updateHex(newHue, saturation, brightness, alpha);
                                     }}
                                 />
 
+                                {/* Alpha Slider */}
+                                {useAlpha && alpha !== undefined && (
+                                    <div className="space-y-2">
+                                        <label className="text-xs">Alpha</label>
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="100"
+                                            value={Math.round(alpha * 100)}
+                                            onChange={(e) => {
+                                                const newAlpha = Number(e.target.value) / 100;
+                                                setAlpha(newAlpha);
+                                                updateHex(hue, saturation, brightness, newAlpha);
+                                            }}
+                                            className="w-full"
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Use Alpha Switch */}
+                                <div className="flex items-center space-x-2">
+                                    <Switch
+                                        checked={useAlpha}
+                                        onCheckedChange={(checked) => {
+                                            setUseAlpha(checked);
+                                            const updatedHex = checked
+                                                ? hsb2hex(hue, saturation, brightness, alpha)
+                                                : hsb2hex(hue, saturation, brightness, 1).slice(
+                                                      0,
+                                                      7,
+                                                  );
+                                            setInputValue(updatedHex);
+                                            setValue(updatedHex);
+                                        }}
+                                    />
+                                    <label className="text-xs">Use Alpha</label>
+                                </div>
+
                                 {/* HEX Input */}
                                 <Input
-                                    value={value}
+                                    value={inputValue}
                                     onChange={(e) => {
-                                        const hex = e.target.value.toUpperCase();
-                                        if (/^#([A-F0-9]{6})$/.test(hex)) {
-                                            const { h, s, b } = hex2hsb(hex);
+                                        let rawValue = e.target.value.toUpperCase();
+                                        if (!rawValue.startsWith('#')) {
+                                            rawValue = `#${rawValue}`;
+                                        }
+                                        rawValue = rawValue.replace(/[^#A-Fa-f0-9]/g, '');
+                                        if (rawValue.length > (useAlpha ? 9 : 7)) {
+                                            rawValue = rawValue.slice(0, useAlpha ? 9 : 7);
+                                        }
+                                        setInputValue(rawValue);
+                                        if (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$/.test(rawValue)) {
+                                            const { h, s, b, a } = hex2hsb(rawValue);
                                             setHue(h);
                                             setSaturation(s);
                                             setBrightness(b);
-                                            setValue(hex);
+                                            setAlpha(a);
+                                            setValue(rawValue);
                                         }
                                     }}
-                                    maxLength={7}
+                                    maxLength={useAlpha ? 9 : 7}
                                     className="font-mono"
                                 />
                             </div>
