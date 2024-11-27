@@ -8,7 +8,7 @@ import type { CommonProps } from '@/types/Props';
 type NumberInputProps = {
     key: number;
     value: number;
-    setValue: (value: number) => void;
+    setValue: React.Dispatch<React.SetStateAction<number>>;
     option?: {
         min?: number;
         max?: number;

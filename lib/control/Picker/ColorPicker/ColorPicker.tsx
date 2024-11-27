@@ -53,8 +53,9 @@ const hex2hsb = (hex: string) => {
 
 // Component
 type ColorPickerProps = {
+    key: string;
     value: string;
-    setValue: (value: string) => void;
+    setValue: React.Dispatch<React.SetStateAction<string>>;
 } & CommonProps;
 
 export const ColorPicker: FC<ColorPickerProps> = ({ title, description, value, setValue }) => {

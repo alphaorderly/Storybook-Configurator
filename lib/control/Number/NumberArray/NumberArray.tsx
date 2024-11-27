@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, type Dispatch, type SetStateAction } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,7 @@ import { twMerge } from 'tailwind-merge';
 type NumberArrayProps = {
     key: number;
     value: number[];
-    setValue: (value: number[]) => void;
+    setValue: Dispatch<SetStateAction<number[]>>;
 } & CommonProps;
 
 export const NumberArray: React.FC<NumberArrayProps> = ({

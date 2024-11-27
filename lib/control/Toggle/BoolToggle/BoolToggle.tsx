@@ -5,7 +5,7 @@ import type { CommonProps } from '@/types/Props';
 
 type BoolToggleProps = {
     value: boolean;
-    setValue: (value: boolean) => void;
+    setValue: React.Dispatch<React.SetStateAction<boolean>>;
     option?: {
         disabled?: boolean;
         onLabel?: string;

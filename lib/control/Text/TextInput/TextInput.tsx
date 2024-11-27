@@ -1,12 +1,11 @@
 import React, { type FC } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { PenLine } from 'lucide-react';
 import type { CommonProps } from '@/types/Props';
 
 type TextInputProps = CommonProps & {
     value: string;
-    setValue: (value: string) => void;
+    setValue: React.Dispatch<React.SetStateAction<string>>;
     option?: {
         placeholder?: string;
         maxLength?: number;

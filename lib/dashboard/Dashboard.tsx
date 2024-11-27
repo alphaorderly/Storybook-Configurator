@@ -6,7 +6,7 @@ import type { FC, PropsWithChildren } from 'react';
 type DashboardProps = PropsWithChildren<
     {
         controls: React.ReactNode[];
-        options?: {
+        option?: {
             minWidth: string;
         };
     } & CommonProps
@@ -17,9 +17,9 @@ export const Dashboard: FC<DashboardProps> = ({
     description,
     controls,
     children,
-    options,
+    option,
 }) => {
-    const { minWidth = '300px' } = options || {};
+    const { minWidth = '300px' } = option || {};
 
     return (
         <Card className="flex flex-col h-screen rounded-none">
