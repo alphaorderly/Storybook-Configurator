@@ -13,7 +13,9 @@ import {
     TextInput,
     TextSelector,
     BoolToggle,
+    TextArea,
 } from '../index';
+import { maxHeaderSize } from 'http';
 
 type StoryProps = ComponentProps<typeof Dashboard>;
 
@@ -38,6 +40,7 @@ export const Default: Story = {
             textinput: 'text',
             textselect: 'o',
             booltoggle: true,
+            textarea: 'text',
         });
 
         const textselectOptions = ['one', 'two', 'three'];
@@ -110,6 +113,17 @@ export const Default: Story = {
                 value={state.booltoggle}
                 setValue={setState.booltoggle}
             />,
+            <TextArea
+                title="Text Area"
+                description="Input a large text"
+                key="textarea"
+                value={state.textarea}
+                setValue={setState.textarea}
+                option={{
+                    maxLength: 100,
+                    maxLines: 10,
+                }}
+            />,
         ];
 
         return (
@@ -133,6 +147,7 @@ export const Default: Story = {
                         <li>Text Input: {state.textinput}</li>
                         <li>Text Selector: {state.textselect}</li>
                         <li>Boolean Toggle: {state.booltoggle ? 'true' : 'false'}</li>
+                        <li>Text Area: {JSON.stringify(state.textarea)}</li>
                     </ul>
                 </div>
             </Dashboard>
