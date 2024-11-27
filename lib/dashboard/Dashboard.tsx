@@ -22,12 +22,12 @@ export const Dashboard: FC<DashboardProps> = ({
     const { minWidth = '300px' } = options || {};
 
     return (
-        <Card className="flex flex-col h-full rounded-none ">
-            <CardHeader className="border-b border-gray-400 sticky top-0 left-0 right-0 bg-white">
+        <Card className="flex flex-col h-screen rounded-none">
+            <CardHeader className="border-b border-gray-400  bg-white">
                 <CardTitle>{title}</CardTitle>
                 <CardDescription>{description}</CardDescription>
             </CardHeader>
-            <CardContent className="flex divide-x-2 p-0">
+            <CardContent className="flex divide-x-2 p-0 overflow-scroll">
                 <div
                     className="flex flex-col self-stretch items-center justify-start overflow-y-scroll p-4 gap-4"
                     style={{
