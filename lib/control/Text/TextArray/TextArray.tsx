@@ -8,6 +8,7 @@ import type { CommonProps } from '@/types/Props';
 import { twMerge } from 'tailwind-merge';
 
 type TextArrayProps = CommonProps & {
+    key: string;
     value: string[];
     setValue: React.Dispatch<React.SetStateAction<string[]>>;
     option?: {

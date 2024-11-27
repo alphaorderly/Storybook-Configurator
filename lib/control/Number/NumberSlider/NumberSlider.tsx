@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import type { CommonProps } from '@/types/Props';
 
 type NumberSliderProps = {
+    key: string;
     value: number;
     setValue: React.Dispatch<React.SetStateAction<number>>;
     option?: {

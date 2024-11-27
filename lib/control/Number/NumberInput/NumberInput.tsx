@@ -6,7 +6,7 @@ import { Minus, Plus } from 'lucide-react';
 import type { CommonProps } from '@/types/Props';
 
 type NumberInputProps = {
-    key: number;
+    key: string;
     value: number;
     setValue: React.Dispatch<React.SetStateAction<number>>;
     option?: {

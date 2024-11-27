@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import type { CommonProps } from '@/types/Props';
 
 type BoolToggleProps = {
+    key: string;
     value: boolean;
     setValue: React.Dispatch<React.SetStateAction<boolean>>;
     option?: {

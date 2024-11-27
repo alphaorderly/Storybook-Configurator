@@ -10,6 +10,7 @@ import {
 import type { CommonProps } from '@/types/Props';
 
 type TextSelectorProps = CommonProps & {
+    key: string;
     value: string;
     setValue: React.Dispatch<React.SetStateAction<string>>;
     select: string[];

@@ -6,6 +6,7 @@ import { Braces, Copy, Check } from 'lucide-react';
 import type { CommonProps } from '@/types/Props';
 
 type ObjectEditorProps<T> = {
+    key: string;
     value: T;
     setValue: React.Dispatch<React.SetStateAction<T>>;
     option?: {

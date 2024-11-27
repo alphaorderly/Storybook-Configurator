@@ -8,7 +8,7 @@ import type { CommonProps } from '@/types/Props';
 import { twMerge } from 'tailwind-merge';
 
 type NumberArrayProps = {
-    key: number;
+    key: string;
     value: number[];
     setValue: Dispatch<SetStateAction<number[]>>;
 } & CommonProps;

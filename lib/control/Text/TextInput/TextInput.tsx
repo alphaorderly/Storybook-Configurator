@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import type { CommonProps } from '@/types/Props';
 
 type TextInputProps = CommonProps & {
+    key: string;
     value: string;
     setValue: React.Dispatch<React.SetStateAction<string>>;
     option?: {
