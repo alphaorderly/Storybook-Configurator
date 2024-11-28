@@ -2,6 +2,27 @@
 
 A versatile tool to set up your components interactively and efficiently.
 
+### HOW TO USE
+
+0. install
+
+```
+npm install -d storybook-configurator
+yarn add -d storybook-configurator
+```
+
+1. Change the layout parameter into 'fullscreen'
+
+```
+layout: 'fullscreen'
+```
+
+2. On render function on Story, set states you want to change with useControlState
+
+3. Create a array with controller
+
+4. Place em all with Dashboard!
+
 ## Table of Contents
 
 -   [Dashboard Component](#dashboard-component)
