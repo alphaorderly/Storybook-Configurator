@@ -2,6 +2,27 @@
 
 A versatile tool to set up your components interactively and efficiently.
 
+### HOW TO USE
+
+0. install
+
+```
+npm install -d storybook-configurator
+yarn add -d storybook-configurator
+```
+
+1. Change the layout parameter into 'fullscreen'
+
+```
+layout: 'fullscreen'
+```
+
+2. On render function on Story, set states you want to change with useControlState
+
+3. Create a array with controller
+
+4. Place em all with Dashboard!
+
 ## Table of Contents
 
 -   [Dashboard Component](#dashboard-component)
@@ -443,7 +464,49 @@ const textselectOptions = ['one', 'two', 'three'];
 | `setValue` | Dispatch<SetStateAction<string\>> | Yes      | State setter function       |
 | `select`   | string[]                          | Yes      | Array of selectable options |
 
-### 9. BoolToggle
+### 9. TextArea
+
+<img width="269" alt="image" src="https://github.com/user-attachments/assets/b9e6f502-1e3a-4ff7-aeeb-e070e76c85de">
+
+A component for entering multi lined text values.
+
+#### Example
+
+```tsx
+<TextArea
+    title="Text Area"
+    description="Input a large text"
+    key="textarea"
+    value={state.textarea}
+    setValue={setState.textarea}
+    option={{
+        maxLength: 100,
+        maxLines: 10,
+    }}
+/>
+```
+
+#### Option
+
+```
+option?: {
+    placeholder?: string;
+    // Placeholder for string
+    maxLength?: number;
+    // Maximum length
+    maxLines?: number;
+    // Maximum lines
+};
+```
+
+#### Type
+
+| Property   | Type                              | Required | Description            |
+| ---------- | --------------------------------- | -------- | ---------------------- |
+| `value`    | string                            | Yes      | Current selected value |
+| `setValue` | Dispatch<SetStateAction<string\>> | Yes      | State setter function  |
+
+### 10. BoolToggle
 
 <img width="286" alt="image" src="https://github.com/user-attachments/assets/b0fa26fa-3cd1-4146-bbb5-e32ebd2aa60c">
 
