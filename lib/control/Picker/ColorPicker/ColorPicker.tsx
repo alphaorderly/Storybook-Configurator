@@ -8,9 +8,11 @@ import type { CommonProps } from '@/types/Props';
 
 // Utility Functions
 const hsb2hex = (h: number, s: number, b: number, a?: number): string => {
+    // Calculate hsb to rgb
     const c = (b / 100) * (s / 100);
     const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
     const m = b / 100 - c;
+
     const [r, g, b2] =
         h < 60
             ? [c, x, 0]
@@ -23,16 +25,16 @@ const hsb2hex = (h: number, s: number, b: number, a?: number): string => {
                   : h < 300
                     ? [x, 0, c]
                     : [c, 0, x];
+
     const rgb = [r, g, b2].map((v) =>
         Math.round((v + m) * 255)
             .toString(16)
             .padStart(2, '0'),
     );
 
+    // Add alpha if provided
     if (a !== undefined) {
-        const alpha = Math.round(a * 255)
-            .toString(16)
-            .padStart(2, '0');
+        const alpha = a.toString(16).padStart(2, '0');
 
         return `#${[...rgb, alpha].join('').toUpperCase()}`;
     }
@@ -40,30 +42,75 @@ const hsb2hex = (h: number, s: number, b: number, a?: number): string => {
     return `#${rgb.join('').toUpperCase()}`;
 };
 
-const hex2hsb = (hex: string) => {
-    const [r, g, b, a] = hex.match(/\w\w/g)?.map((x) => parseInt(x, 16) / 255) ?? [
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-    ];
+const hex2hsb = (
+    hex: string,
+): {
+    h: number;
+    s: number;
+    b: number;
+    a?: number;
+} => {
+    let r = 0;
+    let g = 0;
+    let b = 0;
+    let a: number | undefined = undefined;
 
-    if (r === undefined || g === undefined || b === undefined) {
+    // If it does not start with #, add #
+    if (!hex.startsWith('#')) {
+        hex = `#${hex}`;
+    }
+
+    // If the length is less than 7, add 0
+    if (hex.length < 7) {
+        while (hex.length < 7) {
+            hex += '0';
+        }
+    }
+
+    // parse each value
+    // if length is invalid, return 0
+    if (hex.length === 9) {
+        r = parseInt(hex.slice(1, 3), 16);
+        g = parseInt(hex.slice(3, 5), 16);
+        b = parseInt(hex.slice(5, 7), 16);
+        a = parseInt(hex.slice(7, 9), 16);
+    } else if (hex.length === 7) {
+        r = parseInt(hex.slice(1, 3), 16);
+        g = parseInt(hex.slice(3, 5), 16);
+        b = parseInt(hex.slice(5, 7), 16);
+    } else {
+        return { h: 0, s: 0, b: 0 };
+    }
+
+    // check rgbs are valid
+    if (isNaN(r) || isNaN(g) || isNaN(b)) {
+        return { h: 0, s: 0, b: 0 };
+    }
+
+    // check alpha is valid if provided
+    if (a !== undefined && isNaN(a)) {
         return { h: 0, s: 0, b: 0, a: 0 };
     }
 
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
+    const normalizedR = r / 255;
+    const normalizedG = g / 255;
+    const normalizedB = b / 255;
+
+    // Calculate rgb to hsb using normalized values
+    const max = Math.max(normalizedR, normalizedG, normalizedB);
+    const min = Math.min(normalizedR, normalizedG, normalizedB);
     const delta = max - min;
     const h = delta
-        ? max === r
-            ? ((g - b) / delta) % 6
-            : max === g
-              ? (b - r) / delta + 2
-              : (r - g) / delta + 4
+        ? max === normalizedR
+            ? ((normalizedG - normalizedB) / delta) % 6
+            : max === normalizedG
+              ? (normalizedB - normalizedR) / delta + 2
+              : (normalizedR - normalizedG) / delta + 4
         : 0;
     const s = max ? (delta / max) * 100 : 0;
-    return { h: Math.round(h * 60), s: Math.round(s), b: Math.round(max * 100), a: a };
+    const b2 = max * 100; // 이제 올바른 범위(0-100)가 됩니다
+
+    return { h: Math.round(h * 60), s: Math.round(s), b: Math.round(b2), a: a };
 };
 
 // Component
@@ -80,7 +127,7 @@ export const ColorPicker: FC<ColorPickerProps> = ({ title, description, value, s
     const [saturation, setSaturation] = useState(s);
     const [brightness, setBrightness] = useState(b);
 
-    const [alpha, setAlpha] = useState(a);
+    const [alpha, setAlpha] = useState(a ?? 255);
     const [useAlpha, setUseAlpha] = useState(value.length === 9);
 
     const [inputValue, setInputValue] = useState(() =>
@@ -94,8 +141,8 @@ export const ColorPicker: FC<ColorPickerProps> = ({ title, description, value, s
         newAlpha?: number,
     ) => {
         const newHex = hsb2hex(newHue, newSaturation, newBrightness, newAlpha);
-        setValue(newHex);
-        setInputValue(useAlpha ? newHex.slice(0, 9) : newHex.slice(0, 7)); // 알파값 제거된 HEX 업데이트
+        setValue(newAlpha !== undefined ? newHex.slice(0, 9) : newHex.slice(0, 7));
+        setInputValue(newAlpha !== undefined ? newHex.slice(0, 9) : newHex.slice(0, 7));
     };
 
     const gradientBackground = useMemo(() => hsb2hex(hue, 100, 100), [hue]);
@@ -135,6 +182,7 @@ export const ColorPicker: FC<ColorPickerProps> = ({ title, description, value, s
                                             Math.max(0, e.clientX - rect.left),
                                             rect.width,
                                         );
+
                                         const y = Math.min(
                                             Math.max(0, e.clientY - rect.top),
                                             rect.height,
@@ -143,9 +191,16 @@ export const ColorPicker: FC<ColorPickerProps> = ({ title, description, value, s
                                         const newBrightness = Math.round(
                                             100 - (y / rect.height) * 100,
                                         );
+
                                         setSaturation(newSaturation);
                                         setBrightness(newBrightness);
-                                        updateHex(hue, newSaturation, newBrightness, alpha);
+
+                                        updateHex(
+                                            hue,
+                                            newSaturation,
+                                            newBrightness,
+                                            useAlpha ? alpha : undefined,
+                                        );
                                     }}
                                 />
 
@@ -162,9 +217,16 @@ export const ColorPicker: FC<ColorPickerProps> = ({ title, description, value, s
                                             Math.max(0, e.clientX - rect.left),
                                             rect.width,
                                         );
+
                                         const newHue = Math.round((x / rect.width) * 360);
                                         setHue(newHue);
-                                        updateHex(newHue, saturation, brightness, alpha);
+
+                                        updateHex(
+                                            newHue,
+                                            saturation,
+                                            brightness,
+                                            useAlpha ? alpha : undefined,
+                                        );
                                     }}
                                 />
 
@@ -175,10 +237,10 @@ export const ColorPicker: FC<ColorPickerProps> = ({ title, description, value, s
                                         <input
                                             type="range"
                                             min="0"
-                                            max="100"
-                                            value={Math.round(alpha * 100)}
+                                            max="255"
+                                            value={alpha}
                                             onChange={(e) => {
-                                                const newAlpha = Number(e.target.value) / 100;
+                                                const newAlpha = +e.target.value;
                                                 setAlpha(newAlpha);
                                                 updateHex(hue, saturation, brightness, newAlpha);
                                             }}
@@ -193,12 +255,11 @@ export const ColorPicker: FC<ColorPickerProps> = ({ title, description, value, s
                                         checked={useAlpha}
                                         onCheckedChange={(checked) => {
                                             setUseAlpha(checked);
+
                                             const updatedHex = checked
                                                 ? hsb2hex(hue, saturation, brightness, alpha)
-                                                : hsb2hex(hue, saturation, brightness, 1).slice(
-                                                      0,
-                                                      7,
-                                                  );
+                                                : hsb2hex(hue, saturation, brightness);
+
                                             setInputValue(updatedHex);
                                             setValue(updatedHex);
                                         }}
@@ -210,22 +271,27 @@ export const ColorPicker: FC<ColorPickerProps> = ({ title, description, value, s
                                 <Input
                                     value={inputValue}
                                     onChange={(e) => {
-                                        let rawValue = e.target.value.toUpperCase();
-                                        if (!rawValue.startsWith('#')) {
-                                            rawValue = `#${rawValue}`;
+                                        // if e includes invalid characters, other than A-F, a-f, 0-9, #, return
+                                        if (!/^#[0-9A-Fa-f]*$/.test(e.target.value)) {
+                                            return;
                                         }
-                                        rawValue = rawValue.replace(/[^#A-Fa-f0-9]/g, '');
-                                        if (rawValue.length > (useAlpha ? 9 : 7)) {
-                                            rawValue = rawValue.slice(0, useAlpha ? 9 : 7);
-                                        }
+
+                                        // Get raw value and update the state
+                                        const rawValue = e.target.value.toUpperCase();
                                         setInputValue(rawValue);
-                                        if (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$/.test(rawValue)) {
-                                            const { h, s, b, a } = hex2hsb(rawValue);
-                                            setHue(h);
-                                            setSaturation(s);
-                                            setBrightness(b);
-                                            setAlpha(a);
-                                            setValue(rawValue);
+
+                                        // Check the color
+                                        const { h, s, b, a } = hex2hsb(rawValue);
+                                        setHue(h);
+                                        setSaturation(s);
+                                        setBrightness(b);
+                                        setAlpha(a ?? 255);
+
+                                        // Update the color value
+                                        if (useAlpha) {
+                                            setValue(rawValue.slice(0, 9));
+                                        } else {
+                                            setValue(rawValue.slice(0, 7));
                                         }
                                     }}
                                     maxLength={useAlpha ? 9 : 7}
