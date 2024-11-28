@@ -36,7 +36,7 @@ export const Dashboard: FC<DashboardProps> = ({
                 >
                     {controls}
                 </div>
-                <div className="flex flex-col self-stretch items-center justify-center overflow-auto flex-1 p-2">
+                <div className="flex flex-col self-stretch items-center justify-center overflow-auto flex-1">
                     {children}
                 </div>
             </CardContent>
