@@ -201,6 +201,19 @@ setState.numberarray([1, 3]); // Update the state with a new array
 setState.numberarray((prev) => prev.filter((item) => item !== 1)); // Works like useState
 ```
 
+#### How to deal with types
+
+##### empty array
+
+-   use as to set types for array
+
+```
+const [state, setState] = useControlState({
+    numberarray: [] as number[],
+    stringarray: [] as string[],
+})
+```
+
 ## Control Components
 
 ### 1. NumberArray

@@ -23,8 +23,8 @@ export const Default: Story = {
             <TextSelector
                 title="Text Selector"
                 description="Description"
-                selected={selected}
-                setSelected={setSelected}
+                value={selected}
+                setValue={setSelected}
                 select={select}
             />
         );
